@@ -16,7 +16,7 @@ import tp.metodosAgiles.gestionLicencias.entity.enums.*;
 @AllArgsConstructor
 @Entity
 @Table(name = "titulares", uniqueConstraints = {
-        @UniqueConstraint(columnNames = { "tipoDocumento", "nroDocumento" })
+        @UniqueConstraint(name = "uk_documento", columnNames = { "tipo_documento", "nro_documento" })
 })
 public class Titular {
     @Id
@@ -29,10 +29,11 @@ public class Titular {
     @Column(nullable = false)
     private String apellido;
 
+    @Column(name = "tipo_documento", nullable = false)
     @Enumerated(EnumType.STRING)
     private TipoDocumento tipoDocumento;
 
-    @Column(nullable = false)
+    @Column(name = "nro_documento", nullable = false)
     private String nroDocumento;
 
     private String direccion;
