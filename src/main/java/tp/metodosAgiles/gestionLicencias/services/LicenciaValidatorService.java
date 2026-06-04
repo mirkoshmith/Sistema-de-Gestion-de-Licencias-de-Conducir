@@ -12,6 +12,8 @@ import tp.metodosAgiles.gestionLicencias.entity.enums.ClaseLicencia;
 @Service
 public class LicenciaValidatorService {
 
+    private final TitularService titularService = new TitularService();
+
     public boolean validarEdadMinima(LocalDate fechaNacimiento, String claseSolicitada) {
         int edad = calcularEdad(fechaNacimiento);
 
@@ -46,9 +48,7 @@ public class LicenciaValidatorService {
         LocalDate fechaNacimiento = titular.getFechaNacimiento();
         int edad = calcularEdad(fechaNacimiento);
 
-        // HAY QUE HACER UN METODO QUE CALCULE ESPRIMERAVEZ TIPO:
-        // Titular.esPrimerLicencia(Licencia);
-        boolean esPrimeraVez = false;
+        boolean esPrimeraVez = titularService.esPrimeraLicencia(licencia);
 
         // caso imposible
         if (edad < 17)
