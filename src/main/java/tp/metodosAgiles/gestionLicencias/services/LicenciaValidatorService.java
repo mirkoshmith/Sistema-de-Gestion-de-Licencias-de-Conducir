@@ -4,15 +4,22 @@ import java.time.LocalDate;
 import java.time.Period;
 
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import tp.metodosAgiles.gestionLicencias.entity.Licencia;
 import tp.metodosAgiles.gestionLicencias.entity.Titular;
 import tp.metodosAgiles.gestionLicencias.entity.enums.ClaseLicencia;
+import tp.metodosAgiles.gestionLicencias.repository.LicenciaRepository;
 
 @Service
 public class LicenciaValidatorService {
 
     private final TitularService titularService = new TitularService();
+
+    // Inyecto el Repositorio de Licencias para (T-03) [Mirko]
+    @Autowired
+    private LicenciaRepository licenciaRepository;
+    // --------------------------------------------------
 
     public boolean validarEdadMinima(LocalDate fechaNacimiento, String claseSolicitada) {
         int edad = calcularEdad(fechaNacimiento);
@@ -99,6 +106,25 @@ public class LicenciaValidatorService {
             };
             default -> -1;
         };
+    }
+
+    // H1 -> (T-03): Método para validar historial Clase B [Mirko]
+    public boolean validarHistorialProfesional(Long titularId, String claseSolicitada) {
+        if (!claseSolicitada.matches("[CDE]")) {
+            return true;
+        }
+
+        java.util.Optional<Licencia> licenciaB = licenciaRepository
+                .findFirstByTitularIdAndClaseOrderByFechaEmisionAsc(titularId, ClaseLicencia.B);
+
+        if (licenciaB.isPresent()) {
+            java.time.LocalDate fechaEmisionB = licenciaB.get().getFechaEmision();
+            java.time.LocalDate haceUnAnioExacto = java.time.LocalDate.now().minusYears(1);
+
+            return !fechaEmisionB.isAfter(haceUnAnioExacto);
+        }
+
+        return false;
     }
 
 }
