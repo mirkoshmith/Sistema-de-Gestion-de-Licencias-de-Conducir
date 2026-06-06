@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Comprobante de Pago</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            width: 300px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px dashed #000;
+        }
+        h2 { text-align: center; font-size: 18px; margin-bottom: 5px; }
+        .subtitle { text-align: center; margin-top: 0; margin-bottom: 15px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+        td { padding: 4px 0; }
+        .right { text-align: right; }
+        .total td { font-weight: bold; border-top: 1px solid #000; padding-top: 10px; }
+
+        /*
+        Este agregado es para configurar el tamaño de impresión en una impresora térmica, pero para el TP no veo necesario agregarlo y creo que podría traer problemas a futuro (segpun mi criterio).
+        @page {
+            size: 80mm 150mm; Ancho de ticketera térmica y largo estimado
+            margin: 5mm;
+        }
+        */
+    </style>
+</head>
+<body>
+    <h2>Municipalidad de Santa Fe</h2>
+    <p class="subtitle">Caja Municipal - Comprobante de Pago</p>
+    
+    <hr />
+    
+    <table>
+        <tr>
+            <td>Titular:</td>
+            <td class="right" th:text="${nombreTitular}">Juan Perez</td>
+        </tr>
+        <tr>
+            <td>DNI:</td>
+            <td class="right" th:text="${dniTitular}">12345678</td>
+        </tr>
+        <tr>
+            <td>Clase Solicitada:</td>
+            <td class="right" th:text="${clase}">B</td>
+        </tr>
+    </table>
+
+    <hr />
+    
+    <table>
+        <tr>
+            <td>Arancel Base:</td>
+            <td class="right">$<span th:text="${costoBase}">40.00</span></td>
+        </tr>
+        <tr>
+            <td>Gastos Admin:</td>
+            <td class="right">$8.00</td>
+        </tr>
+        <tr class="total">
+            <td>TOTAL A PAGAR:</td>
+            <td class="right">$<span th:text="${costoTotal}">48.00</span></td>
+        </tr>
+    </table>
+</body>
+</html>
