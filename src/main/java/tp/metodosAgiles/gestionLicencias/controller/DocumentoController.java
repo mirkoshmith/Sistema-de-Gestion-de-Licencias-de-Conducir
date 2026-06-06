@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -61,6 +62,28 @@ public class DocumentoController {
             return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
 
         } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    //Agrego un Endpoint nuevo para la T-10: Descargar un PDF con el detalle de la licencia (nombre, DNI, clase, vigencia, fecha de emisión)
+    @GetMapping("/licencia/{id}")
+    public ResponseEntity<byte[]> descargarLicenciaFisica(@PathVariable("id") Long id) {
+        try {
+            // Llamamos al nuevo método pasándole el ID de la URL
+            byte[] pdfBytes = pdfDocumentoService.generarLicenciaFisica(id);
+
+            // Configuramos los encabezados (Usamos 'inline' igual que en el ticket)
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"licencia-" + id + ".pdf\"");
+            headers.setContentLength(pdfBytes.length);
+
+            return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+
+        } catch (Exception e) {
+            // Si el ID no existe o hay un error, devolvemos un 404 o 500
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }

@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Licencia de Conducir</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #222;
+        }
+
+        /* Contenedor que simula el tamaño de la tarjeta plástica */
+        .tarjeta {
+            width: 320px;
+            height: 200px;
+            border: 1px solid #000;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            padding: 10px;
+            box-sizing: border-box;
+            background-color: #f4f8ff;
+        }
+
+        /* Estilo exclusivo para el dorso */
+        .dorso {
+            background-color: #fff;
+        }
+
+        .header {
+            text-align: center;
+            font-weight: bold;
+            font-size: 12px;
+            border-bottom: 2px solid #0056b3;
+            margin-bottom: 8px;
+            padding-bottom: 4px;
+            color: #0056b3;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        /* Recuadro simulando la foto 4x4 */
+        .foto-container {
+            width: 95px;
+            height: 95px;
+            border: 1px solid #999;
+            text-align: center;
+            vertical-align: middle;
+            background-color: #ddd;
+            font-size: 10px;
+            color: #666;
+        }
+
+        .datos-container {
+            padding-left: 10px;
+            vertical-align: top;
+        }
+
+        .dato-label {
+            font-size: 8px;
+            color: #555;
+            margin: 0;
+            text-transform: uppercase;
+        }
+
+        .dato-valor {
+            font-size: 11px;
+            font-weight: bold;
+            margin: 0 0 4px 0;
+            text-transform: uppercase;
+        }
+
+        /* Tabla inferior (Nacimiento, Otorgamiento, etc.) */
+        .datos-fechas td {
+            width: 25%;
+            text-align: center;
+            vertical-align: top;
+        }
+
+        /* Letra de la clase */
+        .clase-box {
+            display: block;
+            font-size: 22px;
+            font-weight: bold;
+            color: black;
+            line-height: 0.7;
+        }
+
+        .codigo-barras {
+            margin-top: 15px;
+            text-align: center;
+            color: #888;
+            letter-spacing: 2px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- FRENTE -->
+    <div class="tarjeta">
+
+        <div class="header">
+            MUNICIPALIDAD DE SANTA FE<br/>
+            LICENCIA DE CONDUCIR
+        </div>
+
+        <table>
+            <tr>
+                <td class="foto-container">
+                    FOTO<br/>TITULAR
+                </td>
+
+                <td class="datos-container">
+
+                    <p class="dato-label">Apellido</p>
+                    <p class="dato-valor" th:text="${apellido}">
+                        PEREZ
+                    </p>
+
+                    <p class="dato-label">Nombre</p>
+                    <p class="dato-valor" th:text="${nombre}">
+                        JUAN
+                    </p>
+
+                    <p class="dato-label">Nro. Documento</p>
+                    <p class="dato-valor" th:text="${dni}">
+                        12345678
+                    </p>
+
+                    <p class="dato-label">Domicilio</p>
+                    <p class="dato-valor" th:text="${direccion}">
+                        CALLE FALSA 123
+                    </p>
+
+                </td>
+            </tr>
+        </table>
+
+        <table class="datos-fechas" style="margin-top: 5px;">
+            <tr>
+
+                <td>
+                    <p class="dato-label">Nacimiento</p>
+                    <p class="dato-valor" th:text="${fechaNacimiento}">
+                        2000-01-01
+                    </p>
+                </td>
+
+                <td>
+                    <p class="dato-label">Otorgamiento</p>
+                    <p class="dato-valor" th:text="${fechaEmision}">
+                        2024-01-01
+                    </p>
+                </td>
+
+                <td>
+                    <p class="dato-label">Vencimiento</p>
+                    <p class="dato-valor" th:text="${fechaVencimiento}">
+                        2029-01-01
+                    </p>
+                </td>
+
+                <td>
+                    <p class="dato-label">Clase</p>
+                    <span class="clase-box" th:text="${clase}">
+                        B
+                    </span>
+                </td>
+
+            </tr>
+        </table>
+
+    </div>
+
+    <!-- DORSO -->
+    <div class="tarjeta dorso">
+
+        <div class="header" style="color: #444; border-color: #444;">
+            DATOS COMPLEMENTARIOS
+        </div>
+
+        <table style="margin-top: 15px;">
+            <tr>
+
+                <td width="50%">
+                    <p class="dato-label">
+                        Grupo y Factor Sanguíneo
+                    </p>
+
+                    <p class="dato-valor"
+                       th:text="${grupoSanguineo}">
+                        A POSITIVO
+                    </p>
+                </td>
+
+                <td width="50%">
+                    <p class="dato-label">
+                        Donante de Órganos
+                    </p>
+
+                    <p class="dato-valor"
+                       th:text="${donante}">
+                        SI
+                    </p>
+                </td>
+
+            </tr>
+        </table>
+
+        <hr style="
+            border: 0;
+            border-top: 1px dashed #ccc;
+            margin: 20px 0;
+        " />
+
+        <p class="dato-label">
+            Observaciones / Limitaciones
+        </p>
+
+        <p class="dato-valor"
+           th:text="${observaciones}">
+            Ninguna
+        </p>
+
+        <div class="codigo-barras">
+            |||| || ||| |||| || | ||| || ||| ||<br/>
+            <span style="font-size: 8px;">
+                MINISTERIO DE TRANSPORTE
+            </span>
+        </div>
+
+    </div>
+
+</body>
+</html>
