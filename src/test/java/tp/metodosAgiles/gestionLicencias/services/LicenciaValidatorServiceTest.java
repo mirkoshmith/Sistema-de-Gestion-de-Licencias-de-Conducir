@@ -24,7 +24,7 @@ class LicenciaValidatorServiceTest {
     private LicenciaRepository licenciaRepository;
 
     @InjectMocks
-    private LicenciaValidatorService validatorService;
+    private LicenciaService validatorService;
 
     @Test
     @DisplayName("Historial Profesional: Retorna true si tiene licencia B con más de un año de antigüedad")

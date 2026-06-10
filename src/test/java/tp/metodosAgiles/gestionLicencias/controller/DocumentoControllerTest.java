@@ -12,7 +12,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import tp.metodosAgiles.gestionLicencias.entity.enums.ClaseLicencia;
-import tp.metodosAgiles.gestionLicencias.services.LicenciaValidatorService;
+import tp.metodosAgiles.gestionLicencias.services.LicenciaService;
 import tp.metodosAgiles.gestionLicencias.services.PdfDocumentoService;
 
 import static org.mockito.Mockito.*;
@@ -29,7 +29,7 @@ public class DocumentoControllerTest {
     private PdfDocumentoService pdfDocumentoService;
 
     @Mock
-    private LicenciaValidatorService licenciaValidatorService;
+    private LicenciaService licenciaValidatorService;
 
     @InjectMocks
     private DocumentoController documentoController;
