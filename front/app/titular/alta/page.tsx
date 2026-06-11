@@ -47,16 +47,48 @@ export default function AltaTitularPremium() {
         return { valido: true };
     };
 
-    const onFinish = (values: any) => {
-        const payload = {
-            ...values,
-            fechaNacimiento: values.fechaNacimiento ? values.fechaNacimiento.format('YYYY-MM-DD') : null,
-            usuarioOperador: "Administrativo_Logueado"
-        };
-        console.log('Payload listo para Spring Boot:', payload);
-        message.success('¡Datos del titular validados y estructurados con éxito!');
-    };
+    const onFinish = async (values: any) => {
+        const strSangre = values.grupoSanguineo;
+        const grupo = strSangre.slice(0, -1);
+        const factorSigno = strSangre.slice(-1);
+        const factorEnum = factorSigno === '+' ? 'POSITIVO' : 'NEGATIVO';
 
+        const payload = {
+            nombre: values.nombre,
+            apellido: values.apellido,
+            tipoDocumento: values.tipoDoc,
+            nroDocumento: values.nroDoc,
+            direccion: values.direccion,
+            grupoSanguineo: grupo,
+            factorRh: factorEnum,
+            fechaNacimiento: values.fechaNacimiento ? values.fechaNacimiento.format('YYYY-MM-DD') : null,
+            donante: values.donante === 'SI',
+            claseSolicitada: values.claseSolicitada
+        };
+
+        try {
+            const response = await fetch('http://localhost:8080/api/titulares/alta', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            });
+
+            const respuestaTexto = await response.text();
+
+            if (response.ok) {
+                message.success('¡Titular registrado con éxito en la Base de Datos!');
+                form.resetFields();
+                setEdadCalculada(null);
+            } else {
+                message.error(respuestaTexto || 'Error al registrar el titular.');
+            }
+        } catch (error) {
+            console.error('Error de red:', error);
+            message.error('No se pudo conectar con el servidor de Spring Boot. ¿Está encendido?');
+        }
+    };
     return (
         <div style={{
             background: '#f5f7fa',

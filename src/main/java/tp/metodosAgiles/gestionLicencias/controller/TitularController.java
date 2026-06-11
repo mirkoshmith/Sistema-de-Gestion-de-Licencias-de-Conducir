@@ -8,6 +8,7 @@ import tp.metodosAgiles.gestionLicencias.services.TitularService;
 
 @RestController
 @RequestMapping("/api/titulares")
+@CrossOrigin(origins = "http://localhost:3000")
 public class TitularController {
 
     private final TitularService titularService;
