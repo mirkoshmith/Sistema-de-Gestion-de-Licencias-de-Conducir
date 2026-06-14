@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Form, Input, Select, Button, DatePicker, Radio, Card, Row, Col, Space, Divider, Typography, message, Tag, Flex } from 'antd';
-import { UserOutlined, IdcardOutlined, HomeOutlined, HeartOutlined, SolutionOutlined } from '@ant-design/icons';
+import { useRouter } from 'next/navigation'; 
+import { Form, Input, Select, Button, DatePicker, Radio, Card, Row, Col, Space, Divider, Typography, message, Flex } from 'antd';
+import { UserOutlined, IdcardOutlined, HomeOutlined, HeartOutlined, SolutionOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 
 const { Option } = Select;
@@ -11,6 +12,8 @@ const { Title, Text } = Typography;
 export default function AltaTitularPremium() {
     const [form] = Form.useForm();
     const [edadCalculada, setEdadCalculada] = useState<number | null>(null);
+    
+    const router = useRouter(); 
 
     const manejarCambioFecha = (fecha: any) => {
         if (fecha) {
@@ -89,6 +92,7 @@ export default function AltaTitularPremium() {
             message.error('No se pudo conectar con el servidor de Spring Boot. ¿Está encendido?');
         }
     };
+
     return (
         <div style={{
             background: '#f5f7fa',
@@ -101,41 +105,52 @@ export default function AltaTitularPremium() {
 
                 <Flex
                     align="center"
-                    gap="12px"
+                    justify="space-between"
                     style={{ marginBottom: '18px' }}
                 >
-                    <div style={{
-                        width: '4px',
-                        height: '32px',
-                        backgroundColor: '#1677ff',
-                        borderRadius: '2px'
-                    }} />
+                    <Flex align="center" gap="12px">
+                        <div style={{
+                            width: '4px',
+                            height: '32px',
+                            backgroundColor: '#1677ff',
+                            borderRadius: '2px'
+                        }} />
 
-                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <Title
-                            level={3}
-                            style={{
-                                margin: 0,
-                                fontWeight: 700,
-                                letterSpacing: '-0.02em',
-                                lineHeight: '1.2'
-                            }}
-                        >
-                            <span style={{ color: '#8c8c8c', fontWeight: 400 }}>Región</span>{' '}
-                            <span style={{
-                                background: 'linear-gradient(45deg, #141414, #1677ff)',
-                                WebkitBackgroundClip: 'text',
-                                WebkitTextFillColor: 'transparent',
-                                fontWeight: 800
-                            }}>
-                                Santa Fe
-                            </span>
-                            <span style={{ color: '#bfbfbf', fontWeight: 300, margin: '0 8px' }}>|</span>
-                            <span style={{ color: '#434343', fontSize: '18px', fontWeight: 500, verticalAlign: 'middle' }}>
-                                Gestión de Trámites
-                            </span>
-                        </Title>
-                    </div>
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                            <Title
+                                level={3}
+                                style={{
+                                    margin: 0,
+                                    fontWeight: 700,
+                                    letterSpacing: '-0.02em',
+                                    lineHeight: '1.2'
+                                }}
+                            >
+                                <span style={{ color: '#8c8c8c', fontWeight: 400 }}>Región</span>{' '}
+                                <span style={{
+                                    background: 'linear-gradient(45deg, #141414, #1677ff)',
+                                    WebkitBackgroundClip: 'text',
+                                    WebkitTextFillColor: 'transparent',
+                                    fontWeight: 800
+                                }}>
+                                    Santa Fe
+                                </span>
+                                <span style={{ color: '#bfbfbf', fontWeight: 300, margin: '0 8px' }}>|</span>
+                                <span style={{ color: '#434343', fontSize: '18px', fontWeight: 500, verticalAlign: 'middle' }}>
+                                    Gestión de Trámites
+                                </span>
+                            </Title>
+                        </div>
+                    </Flex>
+
+                    <Button 
+                        type="text" 
+                        icon={<ArrowLeftOutlined />} 
+                        onClick={() => router.push('/menu')}
+                        style={{ display: 'flex', alignItems: 'center', fontWeight: 500, color: '#475569' }}
+                    >
+                        Volver al Menú
+                    </Button>
                 </Flex>
 
                 <Form
