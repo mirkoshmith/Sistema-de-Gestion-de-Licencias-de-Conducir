@@ -12,36 +12,15 @@ export default function BuscarLicenciasAdministrativo() {
     const router = useRouter();
     const [form] = Form.useForm();
     const [loading, setLoading] = useState<boolean>(false);
-    
+
     // Estado para guardar la lista de resultados devuelta por Spring Boot
     const [resultados, setResultados] = useState<any[]>([]);
 
-    // Datos simulados (Mock Data) para probar la visualización instantánea
-    const datosDePrueba = [
-        { key: '1', nroDoc: '12345678', apellido: 'Rossi', nombre: 'Juan Ignacio', clase: 'B', vigencia: '15/05/2029', estado: 'VIGENTE' },
-        { key: '2', nroDoc: '23456789', apellido: 'Gomez', nombre: 'María Luz', clase: 'A', vigencia: '22/02/2025', estado: 'EXPIRADA' },
-        { key: '3', nroDoc: '34567890', apellido: 'Fernandez', nombre: 'Carlos', clase: 'C', vigencia: '10/11/2028', estado: 'VIGENTE' },
-        { key: '4', nroDoc: '45678901', apellido: 'Lopez', nombre: 'Ana Clara', clase: 'D', vigencia: '04/01/2026', estado: 'EXPIRADA' },
-    ];
-
-    // 1. Manejo de la combinación de filtros contra el Backend
     const manejarBusqueda = async (values: any) => {
         setLoading(true);
         try {
-            console.log('📡 Enviando combinación de filtros al Backend:', values);
-            // Acá meterías tu fetch con Query Params: 
-            // fetch(`http://localhost:8080/api/licencias/buscar?dni=${values.dni}&apellido=${values.apellido}&estado=${values.estado}`)
-            
-            await new Promise((resolve) => setTimeout(resolve, 1000)); // Delay simulado
-
-            // Filtrado lógico simulado para el TP en base a lo que ingrese el usuario
-            let filtrados = datosDePrueba;
-            if (values.dni) filtrados = filtrados.filter(item => item.nroDoc.includes(values.dni));
-            if (values.apellido) filtrados = filtrados.filter(item => item.apellido.toLowerCase().includes(values.apellido.toLowerCase()));
-            if (values.estado) filtrados = filtrados.filter(item => item.estado === values.estado);
-            if (values.clase) filtrados = filtrados.filter(item => item.clase === values.clase);
-
-            setResultados(filtrados);
+            const response = await fetch(`http://localhost:8080/api/licencias/buscar?nroDocumento=${values.nroDocumento}&apellido=${values.apellido}&estado=${values.estado}&clase=${values.clase}`)
+            setResultados(await response.json());
         } catch (error) {
             console.error('Error al conectar con Spring Boot:', error);
         } finally {
@@ -58,8 +37,8 @@ export default function BuscarLicenciasAdministrativo() {
     const columns = [
         {
             title: 'Documento',
-            dataIndex: 'nroDoc',
-            key: 'nroDoc',
+            dataIndex: 'nroDocumentoTitular',
+            key: 'nroDocumentoTitular',
             render: (text: string) => <Text strong style={{ fontSize: '15px' }}>{text}</Text>,
         },
         {
@@ -83,8 +62,8 @@ export default function BuscarLicenciasAdministrativo() {
         },
         {
             title: 'Vencimiento',
-            dataIndex: 'vigencia',
-            key: 'vigencia',
+            dataIndex: 'fechaVencimiento',
+            key: 'fechaVencimiento',
             render: (text: string) => <Text style={{ fontSize: '15px' }}>{text}</Text>,
         },
         {
@@ -106,7 +85,7 @@ export default function BuscarLicenciasAdministrativo() {
     return (
         <div style={{ background: '#f5f7fa', height: '100vh', maxHeight: '100vh', overflow: 'hidden', padding: '30px 24px' }}>
             <div style={{ maxWidth: 1050, margin: '0 auto' }}>
-                
+
                 {/* CABECERA OPERATIVA DE ACCESIBILIDAD MACRO */}
                 <Flex align="center" justify="space-between" style={{ marginBottom: '24px' }}>
                     <Flex align="center" gap="14px">
@@ -124,9 +103,9 @@ export default function BuscarLicenciasAdministrativo() {
                             </Title>
                         </div>
                     </Flex>
-                    <Button 
-                        type="text" 
-                        icon={<ArrowLeftOutlined style={{ fontSize: '16px' }} />} 
+                    <Button
+                        type="text"
+                        icon={<ArrowLeftOutlined style={{ fontSize: '16px' }} />}
                         onClick={() => router.push('/menu')}
                         style={{ display: 'flex', alignItems: 'center', fontWeight: 600, color: '#475569', fontSize: '15px', height: '40px' }}
                     >
@@ -135,13 +114,23 @@ export default function BuscarLicenciasAdministrativo() {
                 </Flex>
 
                 <Flex vertical gap="16px">
-                    
+
                     {/* PANEL DE CONTROL: COMBINACIÓN DE FILTROS AGRANDADOS */}
                     <Card variant="borderless" style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.05)', borderRadius: '12px' }}>
-                        <Form form={form} layout="vertical" onFinish={manejarBusqueda}>
+                        <Form
+                            form={form}
+                            layout="vertical"
+                            onFinish={manejarBusqueda}
+                            initialValues={{
+                                nroDocumento: "",
+                                apellido: "",
+                                estado: "",
+                                clase: ""
+                            }}
+                        >
                             <Row gutter={[16, 0]} align="bottom">
                                 <Col span={6}>
-                                    <Form.Item name="dni" label={<Text strong style={{ color: '#475569', fontSize: '14px' }}>Nro. Documento</Text>} style={{ margin: 0 }}>
+                                    <Form.Item name="nroDocumento" label={<Text strong style={{ color: '#475569', fontSize: '14px' }}>Nro. Documento</Text>} style={{ margin: 0 }}>
                                         <Input placeholder="Ej: 12345678" style={{ height: '48px', fontSize: '15px' }} />
                                     </Form.Item>
                                 </Col>
@@ -155,29 +144,30 @@ export default function BuscarLicenciasAdministrativo() {
                                         <Select placeholder="Todos" size="large" style={{ height: '48px', fontSize: '15px' }}>
                                             <Option value="VIGENTE">Vigentes</Option>
                                             <Option value="EXPIRADA">Expiradas (Vencidas)</Option>
+                                            <Option value=""> </Option>
                                         </Select>
                                     </Form.Item>
                                 </Col>
                                 <Col span={3}>
                                     <Form.Item name="clase" label={<Text strong style={{ color: '#475569', fontSize: '14px' }}>Clase</Text>} style={{ margin: 0 }}>
                                         <Select placeholder="Todas" size="large" style={{ height: '48px', fontSize: '15px' }}>
-                                            {['A', 'B', 'C', 'D', 'E', 'G'].map(c => <Option key={c} value={c}>{c}</Option>)}
+                                            {['A', 'B', 'C', 'D', 'E', 'G', ''].map(c => <Option key={c} value={c}>{c}</Option>)}
                                         </Select>
                                     </Form.Item>
                                 </Col>
                                 <Col span={4}>
                                     <Flex gap="8px">
-                                        <Button 
-                                            type="primary" 
-                                            htmlType="submit" 
+                                        <Button
+                                            type="primary"
+                                            htmlType="submit"
                                             loading={loading}
                                             icon={<SearchOutlined />}
                                             style={{ background: '#fa8c16', height: '48px', fontWeight: 'bold', flexGrow: 1, fontSize: '14px', borderRadius: '6px' }}
                                         >
                                             Filtrar
                                         </Button>
-                                        <Button 
-                                            type="default" 
+                                        <Button
+                                            type="default"
                                             onClick={limpiarFiltros}
                                             icon={<ClearOutlined />}
                                             style={{ height: '48px', width: '48px', borderRadius: '6px' }}
@@ -190,10 +180,11 @@ export default function BuscarLicenciasAdministrativo() {
 
                     {/* VISTA DE RESULTADOS: TABLA DE ALTO CONTRASTE */}
                     <Card variant="borderless" style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.05)', borderRadius: '12px', padding: '4px' }}>
-                        <Table 
-                            dataSource={resultados} 
-                            columns={columns} 
+                        <Table
+                            dataSource={resultados}
+                            columns={columns}
                             loading={loading}
+                            rowKey="id"
                             pagination={{ pageSize: 5 }}
                             locale={{ emptyText: 'No se han aplicado filtros o no hay registros coincidentes.' }}
                             style={{ fontSize: '16px' }}

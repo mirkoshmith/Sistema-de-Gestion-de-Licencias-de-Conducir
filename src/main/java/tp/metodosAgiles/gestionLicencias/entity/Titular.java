@@ -3,12 +3,26 @@ package tp.metodosAgiles.gestionLicencias.entity;
 import java.time.LocalDate;
 import java.util.List;
 
-import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import tp.metodosAgiles.gestionLicencias.entity.enums.*;
+import tp.metodosAgiles.gestionLicencias.entity.enums.ClaseLicencia;
+import tp.metodosAgiles.gestionLicencias.entity.enums.FactorRh;
+import tp.metodosAgiles.gestionLicencias.entity.enums.GrupoSanguineo;
+import tp.metodosAgiles.gestionLicencias.entity.enums.TipoDocumento;
 
 @Getter
 @Setter
@@ -53,5 +67,6 @@ public class Titular {
     private ClaseLicencia claseSolicitada;
 
     @OneToMany(mappedBy = "titular")
+    @JsonIgnore
     private List<Licencia> licencias;
 }

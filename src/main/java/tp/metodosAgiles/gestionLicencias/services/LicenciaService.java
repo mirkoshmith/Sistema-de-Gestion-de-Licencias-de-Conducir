@@ -2,14 +2,20 @@ package tp.metodosAgiles.gestionLicencias.services;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
-import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import tp.metodosAgiles.gestionLicencias.dto.LicenciaDTO;
 import tp.metodosAgiles.gestionLicencias.entity.Licencia;
 import tp.metodosAgiles.gestionLicencias.entity.Titular;
 import tp.metodosAgiles.gestionLicencias.entity.enums.ClaseLicencia;
+import tp.metodosAgiles.gestionLicencias.entity.enums.EstadoLicencia;
 import tp.metodosAgiles.gestionLicencias.repository.LicenciaRepository;
+import tp.metodosAgiles.gestionLicencias.util.TextUtils;
 
 @Service
 public class LicenciaService {
@@ -125,6 +131,50 @@ public class LicenciaService {
         }
 
         return false;
+    }
+
+    public List<LicenciaDTO> buscarLicencia(String nroDocumento, String apellido, String estado, String clase) {
+        List<Licencia> licenciasSinFiltro = licenciaRepository.findAll();
+
+        List<Licencia> licencias = new ArrayList<>();
+        for (Licencia l : licenciasSinFiltro) {
+
+            boolean coincideApellido = apellido == null ||
+                    apellido.isBlank() ||
+                    TextUtils.normalizarString(l.getTitular().getApellido())
+                            .contains(TextUtils.normalizarString(apellido));
+
+            boolean coincideDocumento = nroDocumento == null ||
+                    nroDocumento.isBlank() ||
+                    TextUtils.normalizarString(l.getTitular().getNroDocumento())
+                            .contains(TextUtils.normalizarString(nroDocumento));
+
+            boolean coincideEstado = estado == null ||
+                    estado.isBlank() ||
+                    TextUtils.normalizarString(obtenerEstadoLicencia(l).toString())
+                            .contains(TextUtils.normalizarString(estado));
+
+            boolean coincideClase = clase == null ||
+                    clase.isBlank() ||
+                    TextUtils.normalizarString(l.getClase().toString())
+                            .contains(TextUtils.normalizarString(clase));
+
+            if (coincideApellido && coincideDocumento && coincideEstado && coincideClase) {
+                licencias.add(l);
+            }
+        }
+
+        return licencias.stream()
+                .map(licencia -> LicenciaDTO.toResponse(licencia, obtenerEstadoLicencia(licencia)))
+                .collect(Collectors.toList());
+    }
+
+    public EstadoLicencia obtenerEstadoLicencia(Licencia licencia) {
+        boolean expirada = licencia.getFechaVencimiento().isBefore(LocalDate.now());
+        if (expirada)
+            return EstadoLicencia.EXPIRADA;
+        else
+            return EstadoLicencia.VIGENTE;
     }
 
 }
