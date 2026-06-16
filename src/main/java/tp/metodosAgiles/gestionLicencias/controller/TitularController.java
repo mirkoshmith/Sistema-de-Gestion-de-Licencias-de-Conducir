@@ -1,9 +1,17 @@
 package tp.metodosAgiles.gestionLicencias.controller;
 
-import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import jakarta.validation.Valid;
 import tp.metodosAgiles.gestionLicencias.dto.TitularDTO;
+import tp.metodosAgiles.gestionLicencias.dto.TitularUpdateDTO;
 import tp.metodosAgiles.gestionLicencias.services.TitularService;
 
 @RestController
@@ -26,4 +34,18 @@ public class TitularController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    @PutMapping("/modificar/{id}")
+    public ResponseEntity<?> modificarTitular(
+            @PathVariable Long id, 
+            @RequestBody TitularUpdateDTO dto) {
+        try {
+            // El servicio nos devuelve el texto con la notificación de renovación
+            String mensaje = titularService.modificarDatosTitular(id, dto);
+            return ResponseEntity.ok(mensaje);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+    
 }
