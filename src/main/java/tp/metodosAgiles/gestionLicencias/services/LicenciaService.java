@@ -187,7 +187,7 @@ public class LicenciaService {
     public boolean puedeRenovarLicencia(String nroDocumento, boolean modificacionDatos) {
 
         Licencia licencia = licenciaRepository
-                .findByTitularAndNroDocumentoOrderByFechaVencimientoDesc(nroDocumento)
+                .findFirstByTitular_NroDocumentoOrderByFechaVencimientoDesc(nroDocumento)
                 .orElseThrow(() -> new RuntimeException("El titular no posee licencias"));
 
         boolean vencida = licencia.getFechaVencimiento().isBefore(LocalDate.now());
@@ -204,7 +204,7 @@ public class LicenciaService {
         // 2. Buscamos la última licencia para copiar los datos (usando el mismo método
         // del Ruso)
         Licencia licenciaAnterior = licenciaRepository
-                .findByTitularAndNroDocumentoOrderByFechaVencimientoDesc(nroDocumento)
+                .findFirstByTitular_NroDocumentoOrderByFechaVencimientoDesc(nroDocumento)
                 .orElseThrow(() -> new RuntimeException("El titular no posee licencias"));
 
         // 3. Armamos la nueva entidad
@@ -237,11 +237,12 @@ public class LicenciaService {
                 .toList();
     }
 
-    public List<LicenciaDTO> buscarLicenciasVigentesConFiltros(String nombre, String apellido, String grupoSanguineo, String factorRh, Boolean donante) {
-        // Ejecutamos la consulta en la BD pasando la fecha actual para garantizar la vigencia
+    public List<LicenciaDTO> buscarLicenciasVigentesConFiltros(String nombre, String apellido, String grupoSanguineo,
+            String factorRh, Boolean donante) {
+        // Ejecutamos la consulta en la BD pasando la fecha actual para garantizar la
+        // vigencia
         List<Licencia> vigentes = licenciaRepository.findLicenciasVigentesByFiltros(
-                LocalDate.now(), nombre, apellido, grupoSanguineo, factorRh, donante
-        );
+                LocalDate.now(), nombre, apellido, grupoSanguineo, factorRh, donante);
 
         // Mapeamos los resultados a DTO marcando el estado explícitamente como VIGENTE
         return vigentes.stream()
