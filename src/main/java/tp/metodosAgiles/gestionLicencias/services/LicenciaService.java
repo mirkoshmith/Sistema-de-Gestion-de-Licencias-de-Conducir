@@ -184,4 +184,15 @@ public class LicenciaService {
         return LicenciaDTO.toResponse(licencia, obtenerEstadoLicencia(licencia));
     }
 
+    public boolean puedeRenovarLicencia(String nroDocumento, boolean modificacionDatos) {
+
+        Licencia licencia = licenciaRepository
+                .findByTitularAndNroDocumentoOrderByFechaVencimientoDesc(nroDocumento)
+                .orElseThrow(() -> new RuntimeException("El titular no posee licencias"));
+
+        boolean vencida = licencia.getFechaVencimiento().isBefore(LocalDate.now());
+
+        return vencida || modificacionDatos;
+    }
+
 }
