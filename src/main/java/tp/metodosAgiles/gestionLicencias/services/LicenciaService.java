@@ -194,5 +194,36 @@ public class LicenciaService {
 
         return vencida || modificacionDatos;
     }
+    
+    public Licencia renovarLicencia(String nroDocumento, boolean modificacionDatos) {
+            // 1. Invocamos la validacion
+            if (!puedeRenovarLicencia(nroDocumento, modificacionDatos)) {
+                throw new RuntimeException("La licencia actual aún está vigente y no hay modificación de datos.");
+            }
+
+            // 2. Buscamos la última licencia para copiar los datos (usando el mismo método del Ruso)
+            Licencia licenciaAnterior = licenciaRepository
+                    .findByTitularAndNroDocumentoOrderByFechaVencimientoDesc(nroDocumento)
+                    .orElseThrow(() -> new RuntimeException("El titular no posee licencias"));
+
+            // 3. Armamos la nueva entidad
+            Licencia nuevaLicencia = new Licencia();
+            nuevaLicencia.setTitular(licenciaAnterior.getTitular());
+            nuevaLicencia.setClase(licenciaAnterior.getClase());
+            nuevaLicencia.setObservacionesLimitaciones(licenciaAnterior.getObservacionesLimitaciones());
+            nuevaLicencia.setFechaEmision(LocalDate.now()); // Fecha actual
+            
+            // 4. Calculamos nueva vigencia y fecha de vencimiento
+            int aniosVigencia = calcularVigencia(nuevaLicencia);
+            LocalDate nuevoVencimiento = tp.metodosAgiles.gestionLicencias.util.DateUtils.calcularVencimientoProximoCumpleanios(
+                    nuevaLicencia.getTitular().getFechaNacimiento(), 
+                    aniosVigencia
+            );
+            nuevaLicencia.setFechaVencimiento(nuevoVencimiento);
+
+            // 5. Guardamos el nuevo registro manteniendo el historial previo
+            return licenciaRepository.save(nuevaLicencia);
+        }
+
 
 }
