@@ -38,23 +38,26 @@ public class LicenciaController {
     }
 
     @PostMapping("/renovar")
-        public ResponseEntity<?> renovarLicencia(
-                @RequestParam String nroDocumento, 
-                @RequestParam boolean modificacionDatos) {
-            try {
-                Licencia licenciaRenovada = licenciaService.renovarLicencia(nroDocumento, modificacionDatos);
-                
-                // Reutilizamos el método toResponse y obtenerEstadoLicencia
-                LicenciaDTO responseDTO = LicenciaDTO.toResponse(
-                    licenciaRenovada, 
-                    licenciaService.obtenerEstadoLicencia(licenciaRenovada)
-                );
-                
-                return ResponseEntity.ok(responseDTO);
-            } catch (RuntimeException e) {
-                return ResponseEntity.badRequest().body(e.getMessage());
-            }
-        }
+    public ResponseEntity<?> renovarLicencia(
+            @RequestParam String nroDocumento,
+            @RequestParam boolean modificacionDatos) {
+        try {
+            Licencia licenciaRenovada = licenciaService.renovarLicencia(nroDocumento, modificacionDatos);
 
+            // Reutilizamos el método toResponse y obtenerEstadoLicencia
+            LicenciaDTO responseDTO = LicenciaDTO.toResponse(
+                    licenciaRenovada,
+                    licenciaService.obtenerEstadoLicencia(licenciaRenovada));
+
+            return ResponseEntity.ok(responseDTO);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/expiradas")
+    public List<LicenciaDTO> obtenerLicenciasExpiradas() {
+        return licenciaService.obtenerLicenciasExpiradas();
+    }
 
 }

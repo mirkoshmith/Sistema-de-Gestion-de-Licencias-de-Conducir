@@ -1,5 +1,6 @@
 package tp.metodosAgiles.gestionLicencias.repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,4 +22,6 @@ public interface LicenciaRepository extends JpaRepository<Licencia, Long> {
     Optional<Licencia> findByTitular_NroDocumento(String nroDocumento);
 
     Optional<Licencia> findByTitularAndNroDocumentoOrderByFechaVencimientoDesc(String nroDocumento);
+
+    List<Licencia> findByFechaVencimientoBeforeOrderByFechaVencimientoDesc(LocalDate fecha);
 }
