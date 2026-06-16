@@ -236,4 +236,16 @@ public class LicenciaService {
                         EstadoLicencia.EXPIRADA))
                 .toList();
     }
+
+    public List<LicenciaDTO> buscarLicenciasVigentesConFiltros(String nombre, String apellido, String grupoSanguineo, String factorRh, Boolean donante) {
+        // Ejecutamos la consulta en la BD pasando la fecha actual para garantizar la vigencia
+        List<Licencia> vigentes = licenciaRepository.findLicenciasVigentesByFiltros(
+                LocalDate.now(), nombre, apellido, grupoSanguineo, factorRh, donante
+        );
+
+        // Mapeamos los resultados a DTO marcando el estado explícitamente como VIGENTE
+        return vigentes.stream()
+                .map(licencia -> LicenciaDTO.toResponse(licencia, EstadoLicencia.VIGENTE))
+                .collect(Collectors.toList());
+    }
 }

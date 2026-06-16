@@ -17,7 +17,7 @@ import tp.metodosAgiles.gestionLicencias.services.LicenciaService;
 
 @RestController
 @RequestMapping("/api/licencias")
-@CrossOrigin(origins = "http://localhost:3000/menu")
+@CrossOrigin(origins = "http://localhost:3000")
 public class LicenciaController {
 
     @Autowired
@@ -58,6 +58,17 @@ public class LicenciaController {
     @GetMapping("/expiradas")
     public List<LicenciaDTO> obtenerLicenciasExpiradas() {
         return licenciaService.obtenerLicenciasExpiradas();
+    }
+
+    @GetMapping("/vigentes")
+    public List<LicenciaDTO> buscarLicenciasVigentes(
+            @RequestParam(required = false) String nombre,
+            @RequestParam(required = false) String apellido,
+            @RequestParam(required = false) String grupoSanguineo,
+            @RequestParam(required = false) String factorRh,
+            @RequestParam(required = false) Boolean donante) {
+        
+        return licenciaService.buscarLicenciasVigentesConFiltros(nombre, apellido, grupoSanguineo, factorRh, donante);
     }
 
 }
