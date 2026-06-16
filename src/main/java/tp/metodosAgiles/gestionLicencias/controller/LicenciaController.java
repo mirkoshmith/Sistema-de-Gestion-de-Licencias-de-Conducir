@@ -29,4 +29,9 @@ public class LicenciaController {
         return licenciaService.buscarLicencia(nroDocumento, apellido, estado, clase);
     }
 
+    @GetMapping("/titular")
+    public LicenciaDTO buscarLicenciaPorTitular(@RequestParam String nroDocumento) {
+        return licenciaService.buscarLicenciaPorTitular(nroDocumento);
+    }
+
 }

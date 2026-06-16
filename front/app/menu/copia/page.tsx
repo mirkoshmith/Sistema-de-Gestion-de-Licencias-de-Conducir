@@ -13,26 +13,29 @@ export default function EmitirCopiaLicencia() {
     const [currentStep, setCurrentStep] = useState<number>(0);
     const [loadingBusqueda, setLoadingBusqueda] = useState<boolean>(false);
     const [loadingEmision, setLoadingEmision] = useState<boolean>(false);
-    
+
     const [licenciaVigente, setLicenciaVigente] = useState<any | null>(null);
     const COSTO_DUPLICADO = 2500.00;
-//HAY Q CAMBIAR ESTO PERO ES DE PRUEBA
+    //HAY Q CAMBIAR ESTO PERO ES DE PRUEBA
     const manejarBusqueda = async (values: { documento: string }) => {
         setLoadingBusqueda(true);
         try {
             console.log('🔍 Buscando licencia vigente para DNI:', values.documento);
             await new Promise((resolve) => setTimeout(resolve, 1200));
 
-            if (values.documento === '12345678' || values.documento.length > 6) {
+            const response = await fetch(`http://localhost:8080/api/licencias/titular?nroDocumento=${values.documento}`);
+            const data = await response.json();
+
+            if (response.ok) {
                 setLicenciaVigente({
-                    titular: 'JUAN IGNACIO ROSSI',
-                    dni: values.documento,
-                    clase: 'B',
-                    fechaEmision: '15/05/2024',
-                    fechaVencimiento: '15/05/2029',
-                    estado: 'VIGENTE',
-                    grupoSanguineo: 'O+',
-                    donante: 'SÍ'
+                    titular: data.nombre + " " + data.apellido,
+                    dni: data.nroDocumentoTitular,
+                    clase: data.clase,
+                    fechaEmision: data.fechaEmision,
+                    fechaVencimiento: data.fechaVencimiento,
+                    estado: data.estado,
+                    grupoSanguineo: data.grupoSanguineo + data.factorRh,
+                    donante: data.donante
                 });
                 message.success('Licencia vigente localizada con éxito.');
                 setCurrentStep(1);
@@ -54,7 +57,7 @@ export default function EmitirCopiaLicencia() {
                 licenciaOriginalId: licenciaVigente.id,
                 dniTitular: licenciaVigente.dni,
                 motivo: "DUPLICADO_POR_EXTRAVIO",
-                operadorLegajo: "L-45902", 
+                operadorLegajo: "L-45902",
                 costoAbonado: COSTO_DUPLICADO
             };
 
@@ -68,7 +71,7 @@ export default function EmitirCopiaLicencia() {
 
             if (response.ok) {
                 message.success('¡Copia de licencia registrada e impresa de forma exitosa!');
-                setCurrentStep(2); 
+                setCurrentStep(2);
             } else {
                 const errorTexto = await response.text();
                 message.error(errorTexto || 'Error al procesar la copia en el sistema.');
@@ -90,7 +93,7 @@ export default function EmitirCopiaLicencia() {
     return (
         <div style={{ background: '#f5f7fa', height: '100vh', maxHeight: '100vh', overflow: 'hidden', padding: '30px 24px' }}>
             <div style={{ maxWidth: 950, margin: '0 auto' }}>
-                
+
                 <Flex align="center" justify="space-between" style={{ marginBottom: '24px' }}>
                     <Flex align="center" gap="14px">
                         <div style={{ width: '5px', height: '38px', backgroundColor: '#722ed1', borderRadius: '3px' }} />
@@ -107,9 +110,9 @@ export default function EmitirCopiaLicencia() {
                             </Title>
                         </div>
                     </Flex>
-                    <Button 
-                        type="text" 
-                        icon={<ArrowLeftOutlined style={{ fontSize: '16px' }} />} 
+                    <Button
+                        type="text"
+                        icon={<ArrowLeftOutlined style={{ fontSize: '16px' }} />}
                         onClick={() => router.push('/menu')}
                         disabled={currentStep === 1 || loadingEmision}
                         style={{ display: 'flex', alignItems: 'center', fontWeight: 600, color: '#475569', fontSize: '15px', height: '40px' }}
@@ -118,8 +121,8 @@ export default function EmitirCopiaLicencia() {
                     </Button>
                 </Flex>
 
-                <Steps 
-                    current={currentStep} 
+                <Steps
+                    current={currentStep}
                     style={{ marginBottom: '28px', padding: '0 10px' }}
                     items={[
                         { title: <span style={{ fontSize: '15px', fontWeight: 500 }}>Buscar Original</span> },
@@ -137,28 +140,28 @@ export default function EmitirCopiaLicencia() {
                                 <Text type="secondary" style={{ fontSize: '14px', display: 'block', marginTop: '6px' }}>Ingrese el número de documento del contribuyente para validar la vigencia de su carnet actual.</Text>
                             </div>
                             <Form form={formBusqueda} layout="inline" onFinish={manejarBusqueda} style={{ alignItems: 'flex-start' }}>
-                                <Form.Item 
-                                    name="documento" 
+                                <Form.Item
+                                    name="documento"
                                     rules={[
                                         { required: true, message: 'Falta el documento.' },
                                         { pattern: /^[0-9]+$/, message: 'Solo números.' }
                                     ]}
                                     style={{ flexGrow: 1, marginRight: '16px' }}
                                 >
-                                    <Input 
-                                        size="large" 
-                                        prefix={<SearchOutlined style={{ fontSize: '18px', color: '#94a3b8' }} />} 
-                                        placeholder="Número de DNI sin puntos (Ej: 12345678)" 
-                                        maxLength={8} 
+                                    <Input
+                                        size="large"
+                                        prefix={<SearchOutlined style={{ fontSize: '18px', color: '#94a3b8' }} />}
+                                        placeholder="Número de DNI sin puntos (Ej: 12345678)"
+                                        maxLength={8}
                                         style={{ height: '54px', fontSize: '16px', borderRadius: '8px' }}
                                     />
                                 </Form.Item>
                                 <Form.Item style={{ marginRight: 0 }}>
-                                    <Button 
-                                        type="primary" 
-                                        htmlType="submit" 
-                                        size="large" 
-                                        loading={loadingBusqueda} 
+                                    <Button
+                                        type="primary"
+                                        htmlType="submit"
+                                        size="large"
+                                        loading={loadingBusqueda}
                                         style={{ background: '#722ed1', height: '54px', fontSize: '16px', fontWeight: 'bold', padding: '0 24px', borderRadius: '8px' }}
                                     >
                                         Buscar Registro
@@ -171,12 +174,30 @@ export default function EmitirCopiaLicencia() {
                     {currentStep === 1 && licenciaVigente && (
                         <Row gutter={20}>
                             <Col span={15}>
-                                <Card 
-                                    variant="borderless" 
+                                <Card
+                                    variant="borderless"
                                     title={<span style={{ fontSize: '17px', fontWeight: 700 }}><IdcardOutlined style={{ marginRight: 8, color: '#722ed1' }} /> Datos del Plástico Original</span>}
                                     style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.05)', borderRadius: '12px' }}
                                 >
-                                    <Descriptions column={2} bordered size="middle" layout="vertical" labelStyle={{ fontSize: '14px', fontWeight: 600, background: '#f8fafc', color: '#475569' }} contentStyle={{ fontSize: '15px', color: '#1e293b', fontWeight: 500 }}>
+                                    <Descriptions
+                                        column={2}
+                                        bordered
+                                        size="middle"
+                                        layout="vertical"
+                                        styles={{
+                                            label: {
+                                                fontSize: '14px',
+                                                fontWeight: 600,
+                                                background: '#f8fafc',
+                                                color: '#475569',
+                                            },
+                                            content: {
+                                                fontSize: '15px',
+                                                color: '#1e293b',
+                                                fontWeight: 500,
+                                            },
+                                        }}
+                                    >
                                         <Descriptions.Item label="Titular Afiliado" span={2}>
                                             <Text strong style={{ color: '#1e293b', fontSize: '18px' }}>{licenciaVigente.titular}</Text>
                                         </Descriptions.Item>
@@ -191,33 +212,33 @@ export default function EmitirCopiaLicencia() {
                             </Col>
 
                             <Col span={9}>
-                                <Card 
-                                    variant="borderless" 
+                                <Card
+                                    variant="borderless"
                                     title={<span style={{ fontSize: '17px', fontWeight: 700 }}><DollarOutlined style={{ marginRight: 8, color: '#52c41a' }} /> Liquidación</span>}
                                     style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.05)', borderRadius: '12px', height: '100%' }}
                                 >
                                     <Flex vertical justify="space-between" style={{ height: '100%', minHeight: '260px' }}>
                                         <div>
-                                            <Statistic 
-                                                title={<span style={{ fontSize: '14px', color: '#64748b', fontWeight: 500 }}>Arancel de Reimpresión</span>} 
-                                                value={COSTO_DUPLICADO} 
-                                                precision={2} 
-                                                prefix="$" 
-                                                styles={{ content: { color: '#0f172a', fontWeight: 900, fontSize: '38px' } }} 
+                                            <Statistic
+                                                title={<span style={{ fontSize: '14px', color: '#64748b', fontWeight: 500 }}>Arancel de Reimpresión</span>}
+                                                value={COSTO_DUPLICADO}
+                                                precision={2}
+                                                prefix="$"
+                                                styles={{ content: { color: '#0f172a', fontWeight: 900, fontSize: '38px' } }}
                                             />
                                             <Text type="secondary" style={{ fontSize: '13px', display: 'block', marginTop: '8px', lineHeight: '1.4' }}>
                                                 Incluye las tasas provinciales e insumos del plástico físico reflectivo.
                                             </Text>
                                         </div>
-                                        
+
                                         <Flex vertical gap="10px">
-                                            <Button 
-                                                type="primary" 
-                                                size="large" 
-                                                icon={<CopyOutlined style={{ fontSize: '18px' }} />} 
-                                                block 
-                                                onClick={confirmarEmisionCopia} 
-                                                loading={loadingEmision} 
+                                            <Button
+                                                type="primary"
+                                                size="large"
+                                                icon={<CopyOutlined style={{ fontSize: '18px' }} />}
+                                                block
+                                                onClick={confirmarEmisionCopia}
+                                                loading={loadingEmision}
                                                 style={{ background: '#722ed1', height: '54px', fontSize: '16px', fontWeight: 'bold', borderRadius: '8px' }}
                                             >
                                                 Confirmar Emisión

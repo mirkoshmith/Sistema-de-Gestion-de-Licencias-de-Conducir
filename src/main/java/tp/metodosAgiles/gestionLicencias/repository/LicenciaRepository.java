@@ -14,6 +14,9 @@ public interface LicenciaRepository extends JpaRepository<Licencia, Long> {
 
     Optional<Licencia> findFirstByTitularIdOrderByFechaEmisionAsc(Long titularId);
 
-    //H1 -> (T-03): Busca la licencia más antigua de una clase específica para un titular
+    // H1 -> (T-03): Busca la licencia más antigua de una clase específica para un
+    // titular
     Optional<Licencia> findFirstByTitularIdAndClaseOrderByFechaEmisionAsc(Long titularId, ClaseLicencia clase);
+
+    Optional<Licencia> findByTitular_NroDocumento(String nroDocumento);
 }

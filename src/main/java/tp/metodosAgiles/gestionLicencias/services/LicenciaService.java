@@ -177,4 +177,11 @@ public class LicenciaService {
             return EstadoLicencia.VIGENTE;
     }
 
+    public LicenciaDTO buscarLicenciaPorTitular(String nroDocumento) {
+
+        Licencia licencia = licenciaRepository.findByTitular_NroDocumento(nroDocumento)
+                .orElseThrow(() -> new RuntimeException("No se encontró la licencia"));
+        return LicenciaDTO.toResponse(licencia, obtenerEstadoLicencia(licencia));
+    }
+
 }

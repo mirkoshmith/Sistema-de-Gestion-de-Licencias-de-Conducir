@@ -21,6 +21,9 @@ public class LicenciaDTO {
     private String fechaEmision;
     private String fechaVencimiento;
     private String estado;
+    private String grupoSanguineo;
+    private String donante;
+    private String factorRh;
 
     public static LicenciaDTO toResponse(Licencia licencia, EstadoLicencia estado) {
         LicenciaDTO dto = new LicenciaDTO();
@@ -33,6 +36,9 @@ public class LicenciaDTO {
         dto.setFechaEmision(licencia.getFechaEmision().toString());
         dto.setFechaVencimiento(licencia.getFechaVencimiento().toString());
         dto.setEstado(estado.toString());
+        dto.setGrupoSanguineo(licencia.getTitular().getGrupoSanguineo().toString());
+        dto.setDonante(licencia.getTitular().getDonante() ? "SÍ" : "NO");
+        dto.setFactorRh(licencia.getTitular().getFactorRh().toString().equals("POSITIVO") ? "+" : "-");
         return dto;
     }
 }
