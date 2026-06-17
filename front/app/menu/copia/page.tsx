@@ -15,7 +15,7 @@ export default function EmitirCopiaLicencia() {
     const [loadingEmision, setLoadingEmision] = useState<boolean>(false);
 
     const [licenciaVigente, setLicenciaVigente] = useState<any | null>(null);
-    const COSTO_DUPLICADO = 2500.00;
+    const COSTO_DUPLICADO = 50.00;
     //HAY Q CAMBIAR ESTO PERO ES DE PRUEBA
     const manejarBusqueda = async (values: { documento: string }) => {
         setLoadingBusqueda(true);
