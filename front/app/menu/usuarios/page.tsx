@@ -55,7 +55,7 @@ export default function EdicionUsuariosAdministrativos() {
         try {
             console.log('Enviando cambios confirmados al Backend:', valoresEditados);
             await new Promise((resolve) => setTimeout(resolve, 1500)); // Delay simulado
-            message.success('¡Usuario administrativo actualizado y auditado con éxito!');
+            message.success('¡Usuario administrativo actualizado con éxito!');
         } catch (error) {
             message.error('Error de red al intentar guardar los cambios.');
         } finally {

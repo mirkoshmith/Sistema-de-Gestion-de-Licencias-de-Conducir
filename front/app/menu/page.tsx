@@ -80,7 +80,7 @@ export default function MenuPrincipal() {
                             <Card 
                                 hoverable 
                                 variant="borderless"
-                                onClick={() => irATramite('licencia/renovar')}
+                                onClick={() => irATramite('menu/renovacion')}
                                 style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.02)', borderRadius: '10px', border: '1px solid #e2e8f0', textAlign: 'center', padding: '12px 0' }}
                             >
                                 <ReloadOutlined style={{ fontSize: '32px', color: '#52c41a', background: '#f6ffed', padding: '16px', borderRadius: '50%', marginBottom: '12px' }} />
