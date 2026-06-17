@@ -10,8 +10,7 @@ const { Title, Text } = Typography;
 
 export default function RenovacionLicencia() {
     const router = useRouter();
-    const [formBusqueda] = Form.useForm();
-    const [formRenovacion] = Form.useForm();
+    const [form] = Form.useForm();
     const [currentStep, setCurrentStep] = useState<number>(0);
     const [loadingBusqueda, setLoadingBusqueda] = useState<boolean>(false);
     const [loadingRenovacion, setLoadingRenovacion] = useState<boolean>(false);
@@ -23,7 +22,6 @@ export default function RenovacionLicencia() {
     const COSTO_RENOVACION = 4800.00;
     const NUEVA_VIGENCIA = "17/06/2031";
 
-    //EJEMPLO (HAY Q CAMBIAR)
     const manejarBusqueda = async (values: { documento: string }) => {
         setLoadingBusqueda(true);
         try {
@@ -39,7 +37,7 @@ export default function RenovacionLicencia() {
                     donante: 'SÍ'
                 };
                 setDatosTitular(datosMock);
-                formRenovacion.setFieldsValue({ motivo: 'VENCIMIENTO_CRONOLOGICO' });
+                form.setFieldsValue({ motivo: 'VENCIMIENTO_CRONOLOGICO' });
                 message.success('Registro de titular localizado.');
                 setCurrentStep(1);
             } else {
@@ -78,8 +76,7 @@ export default function RenovacionLicencia() {
     };
 
     const reiniciarTramite = () => {
-        formBusqueda.resetFields();
-        formRenovacion.resetFields();
+        form.resetFields();
         setDatosTitular(null);
         setValoresFinales(null);
         setCurrentStep(0);
@@ -134,7 +131,7 @@ export default function RenovacionLicencia() {
                                 <Text strong style={{ fontSize: '18px', color: '#1e293b', display: 'block' }}>Iniciar Trámite de Renovación</Text>
                                 <Text type="secondary" style={{ fontSize: '14px', display: 'block', marginTop: '6px' }}>Ingrese el DNI del contribuyente para cargar su historial actual y verificar inhabilitaciones vigentes.</Text>
                             </div>
-                            <Form form={formBusqueda} layout="inline" onFinish={manejarBusqueda} style={{ alignItems: 'flex-start' }}>
+                            <Form form={form} layout="inline" onFinish={manejarBusqueda} style={{ alignItems: 'flex-start' }}>
                                 <Form.Item 
                                     name="documento" 
                                     rules={[{ required: true, message: 'Falta el documento.' }, { pattern: /^[0-9]+$/, message: 'Solo números.' }]}
@@ -164,7 +161,7 @@ export default function RenovacionLicencia() {
                     )}
 
                     {currentStep === 1 && datosTitular && (
-                        <Form form={formRenovacion} layout="vertical" onFinish={previsualizarRenovacion}>
+                        <Form form={form} layout="vertical" onFinish={previsualizarRenovacion}>
                             <Row gutter={20}>
                                 <Col span={14}>
                                     <Card 
@@ -172,7 +169,16 @@ export default function RenovacionLicencia() {
                                         title={<span style={{ fontSize: '17px', fontWeight: 700 }}><IdcardOutlined style={{ marginRight: 8, color: '#1677ff' }} /> Datos Actuales del Contribuyente</span>}
                                         style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.05)', borderRadius: '12px' }}
                                     >
-                                        <Descriptions column={2} bordered size="middle" layout="vertical" labelStyle={{ fontSize: '14px', fontWeight: 600, background: '#f8fafc', color: '#475569' }} contentStyle={{ fontSize: '15px', color: '#1e293b', fontWeight: 500 }}>
+                                        <Descriptions 
+                                            column={2} 
+                                            bordered 
+                                            size="middle" 
+                                            layout="vertical" 
+                                            styles={{
+                                                label: { fontSize: '14px', fontWeight: 600, background: '#f8fafc', color: '#475569' },
+                                                content: { fontSize: '15px', color: '#1e293b', fontWeight: 500 }
+                                            }}
+                                        >
                                             <Descriptions.Item label="Titular Afiliado" span={2}>
                                                 <Text strong style={{ color: '#1e293b', fontSize: '18px' }}>{datosTitular.titular}</Text>
                                             </Descriptions.Item>
