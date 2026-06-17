@@ -10,7 +10,6 @@ import tp.metodosAgiles.gestionLicencias.entity.Usuario;
 import tp.metodosAgiles.gestionLicencias.entity.enums.RolUsuario;
 import tp.metodosAgiles.gestionLicencias.repository.UsuarioRepository;
 
-
 @Service
 public class UsuarioService {
 
@@ -37,7 +36,7 @@ public class UsuarioService {
     }
 
     public Usuario modificarUsuario(Long idUsuarioAEditar, Long idAdmin, UsuarioDTO dtoNuevo) {
-        
+
         // 1. Validar permisos de administrador
         Usuario admin = usuarioRepository.findById(idAdmin)
                 .orElseThrow(() -> new RuntimeException("Administrador no encontrado."));
@@ -52,7 +51,7 @@ public class UsuarioService {
 
         // Validar que si le cambian el username, no le pongan uno que ya está en uso
         if (!usuarioEditado.getUsername().equals(dtoNuevo.getUsername()) &&
-            usuarioRepository.existsByUsername(dtoNuevo.getUsername())) {
+                usuarioRepository.existsByUsername(dtoNuevo.getUsername())) {
             throw new RuntimeException("Ya existe otro usuario utilizando ese username.");
         }
 
@@ -64,11 +63,21 @@ public class UsuarioService {
         usuarioEditado.setRol(dtoNuevo.getRol());
 
         // 4. Registrar auditoría de modificaciones
-        log.info("AUDITORÍA - Modificación: El administrador '{}' (ID: {}) modificó los datos del usuario '{}' (ID: {})", 
+        log.info(
+                "AUDITORÍA - Modificación: El administrador '{}' (ID: {}) modificó los datos del usuario '{}' (ID: {})",
                 admin.getUsername(), admin.getId(), usuarioEditado.getUsername(), usuarioEditado.getId());
 
         // Guardamos los cambios
         return usuarioRepository.save(usuarioEditado);
+    }
+
+    public UsuarioDTO autenticar(String username, String contrasenia) {
+        Usuario usuario = usuarioRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado."));
+        if (!usuario.getPassword().equals(contrasenia)) {
+            throw new RuntimeException("Contraseña incorrecta.");
+        }
+        return UsuarioDTO.toResponse(usuario);
     }
 
 }

@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation';
 import { Form, Input, Button, Card, Row, Col, Typography, Flex, Divider, message, Steps, Statistic, Descriptions, Tag } from 'antd';
 import { SearchOutlined, ArrowLeftOutlined, CopyOutlined, DollarOutlined, IdcardOutlined, CheckCircleOutlined } from '@ant-design/icons';
 
+import { redirect } from "next/navigation";
+import { useEffect } from 'react';
+
 const { Title, Text } = Typography;
 
 export default function EmitirCopiaLicencia() {
@@ -14,13 +17,22 @@ export default function EmitirCopiaLicencia() {
     const [loadingBusqueda, setLoadingBusqueda] = useState<boolean>(false);
     const [loadingEmision, setLoadingEmision] = useState<boolean>(false);
 
+    const usuario = JSON.parse(
+        sessionStorage.getItem("usuario") || "{}"
+    );
+    useEffect(() => {
+        if (sessionStorage.getItem('usuario') === null) {
+            router.replace('/login');
+        }
+    }, [router]);
+
     const [licenciaVigente, setLicenciaVigente] = useState<any | null>(null);
     const COSTO_DUPLICADO = 50.00;
     //HAY Q CAMBIAR ESTO PERO ES DE PRUEBA
     const manejarBusqueda = async (values: { documento: string }) => {
         setLoadingBusqueda(true);
         try {
-            console.log('🔍 Buscando licencia vigente para DNI:', values.documento);
+            console.log('Buscando licencia vigente para DNI:', values.documento);
             await new Promise((resolve) => setTimeout(resolve, 1200));
 
             const response = await fetch(`http://localhost:8080/api/licencias/titular?nroDocumento=${values.documento}`);
@@ -28,6 +40,7 @@ export default function EmitirCopiaLicencia() {
 
             if (response.ok) {
                 setLicenciaVigente({
+                    id: data.id,
                     titular: data.nombre + " " + data.apellido,
                     dni: data.nroDocumentoTitular,
                     clase: data.clase,
@@ -53,20 +66,11 @@ export default function EmitirCopiaLicencia() {
     const confirmarEmisionCopia = async () => {
         setLoadingEmision(true);
         try {
-            const payload = {
-                licenciaOriginalId: licenciaVigente.id,
-                dniTitular: licenciaVigente.dni,
-                motivo: "DUPLICADO_POR_EXTRAVIO",
-                operadorLegajo: "L-45902",
-                costoAbonado: COSTO_DUPLICADO
-            };
-
-            const response = await fetch('http://localhost:8080/api/licencias/copia', {
+            const response = await fetch(`http://localhost:8080/api/copias-licencia/emitir?licenciaId=${licenciaVigente.id}&usuarioId=${usuario.id}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(payload),
+                }
             });
 
             if (response.ok) {

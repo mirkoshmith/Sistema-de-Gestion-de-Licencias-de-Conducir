@@ -3,36 +3,46 @@
 import React, { useState } from 'react';
 import { Form, Input, Button, Checkbox, Typography, Card, Flex, message, Modal } from 'antd';
 import { UserOutlined, LockOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
+import { useRouter } from 'next/navigation';
 
 const { Title, Text, Link } = Typography;
 
 export default function LoginAdministrativo() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [loading, setLoading] = useState<boolean>(false);
+    const router = useRouter();
 
-    const onFinish = async (values: any) => {
-        setLoading(true);
+    const autenticar = async (values: any) => {
         try {
-            console.log('🔑 Credenciales enviadas de forma segura al backend:', values);
-            await new Promise((resolve) => setTimeout(resolve, 1500));
-            message.success('¡Autenticación exitosa! Iniciando sesión en el sistema...');
-        } catch (error) {
-            message.error('Credenciales inválidas. Por favor, intente de nuevo.');
-        } finally {
-            setLoading(false);
+            const response = await fetch(`http://localhost:8080/api/usuarios/auth?usuario=${values.username}&contrasenia=${values.password}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            if (response.ok) {
+                message.success('¡Autenticación exitosa! Iniciando sesión en el sistema...');
+                sessionStorage.setItem('usuario', JSON.stringify(await response.json()));
+                router.push('/menu');
+            } else {
+                message.error('Credenciales inválidas. Por favor, intente de nuevo.');
+            }
+        } catch (e) {
+            console.error(e);
         }
-    };
+    }
 
     return (
         <Flex style={{ height: '100vh', maxHeight: '100vh', overflow: 'hidden', background: '#ffffff' }}>
-            
-            <Flex 
-                vertical 
-                justify="space-between" 
+
+            <Flex
+                vertical
+                justify="space-between"
                 align="start"
-                style={{ 
-                    width: '45%', 
-                    background: 'linear-gradient(135deg, #001529 0%, #1677ff 100%)', 
+                style={{
+                    width: '45%',
+                    background: 'linear-gradient(135deg, #001529 0%, #1677ff 100%)',
                     padding: '40px',
                     position: 'relative'
                 }}
@@ -58,16 +68,16 @@ export default function LoginAdministrativo() {
                 </Text>
             </Flex>
 
-            <Flex 
-                justify="center" 
-                align="center" 
+            <Flex
+                justify="center"
+                align="center"
                 style={{ width: '55%', background: '#f8fafc', padding: '40px' }}
             >
-                <Card 
+                <Card
                     variant="borderless"
-                    style={{ 
-                        width: '100%', 
-                        maxWidth: '420px', 
+                    style={{
+                        width: '100%',
+                        maxWidth: '420px',
                         background: '#ffffff',
                         boxShadow: '0 4px 20px rgba(0, 0, 0, 0.03)',
                         borderRadius: '12px',
@@ -87,7 +97,7 @@ export default function LoginAdministrativo() {
                         name="login_admin"
                         layout="vertical"
                         initialValues={{ remember: true }}
-                        onFinish={onFinish}
+                        onFinish={autenticar}
                         requiredMark={false}
                     >
                         <Form.Item
@@ -95,10 +105,10 @@ export default function LoginAdministrativo() {
                             label={<Text strong style={{ color: '#475569', fontSize: '13px' }}>Usuario o Legajo</Text>}
                             rules={[{ required: true, message: 'El usuario/legajo es obligatorio.' }]}
                         >
-                            <Input 
-                                size="large" 
-                                prefix={<UserOutlined style={{ color: '#94a3b8' }} />} 
-                                placeholder="Ej: admin_santafe" 
+                            <Input
+                                size="large"
+                                prefix={<UserOutlined style={{ color: '#94a3b8' }} />}
+                                placeholder="Ej: admin_santafe"
                                 style={{ borderRadius: '6px' }}
                             />
                         </Form.Item>
@@ -126,16 +136,16 @@ export default function LoginAdministrativo() {
                         </Form.Item>
 
                         <Form.Item style={{ margin: 0 }}>
-                            <Button 
-                                type="primary" 
-                                htmlType="submit" 
-                                size="large" 
-                                block 
+                            <Button
+                                type="primary"
+                                htmlType="submit"
+                                size="large"
+                                block
                                 loading={loading}
-                                style={{ 
-                                    height: '48px', 
-                                    fontSize: '15px', 
-                                    fontWeight: 'bold', 
+                                style={{
+                                    height: '48px',
+                                    fontSize: '15px',
+                                    fontWeight: 'bold',
                                     borderRadius: '6px',
                                     background: '#1677ff',
                                     boxShadow: '0 4px 12px rgba(22, 119, 255, 0.2)'
@@ -148,10 +158,10 @@ export default function LoginAdministrativo() {
                 </Card>
             </Flex>
 
-            <Modal 
+            <Modal
                 title={<Title level={4} style={{ margin: 0 }}>Recuperación de Credenciales Operativas</Title>}
-                open={isModalOpen} 
-                onOk={() => setIsModalOpen(false)} 
+                open={isModalOpen}
+                onOk={() => setIsModalOpen(false)}
                 onCancel={() => setIsModalOpen(false)}
                 okText="Entendido"
                 styles={{ body: { paddingBottom: 0 } }}

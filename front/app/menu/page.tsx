@@ -3,42 +3,52 @@
 import React from 'react';
 import { Card, Row, Col, Typography, Flex, Button, Divider } from 'antd';
 import { useRouter } from 'next/navigation';
-import { 
-    FileAddOutlined, 
-    ReloadOutlined, 
-    CopyOutlined, 
-    SearchOutlined, 
-    UsergroupAddOutlined, 
+import {
+    FileAddOutlined,
+    ReloadOutlined,
+    CopyOutlined,
+    SearchOutlined,
+    UsergroupAddOutlined,
     SafetyCertificateOutlined,
-    PoweroffOutlined 
+    PoweroffOutlined
 } from '@ant-design/icons';
+
+import { useEffect } from 'react';
 
 const { Title, Text } = Typography;
 
 export default function MenuPrincipal() {
 
     const router = useRouter();
-    // Simulación de los datos del operador logueado (Auditoría)
+    const usuario = JSON.parse(
+        sessionStorage.getItem("usuario") || "{}"
+    );
     const operador = {
-        nombre: "admin",
-        legajo: "L-00001",
-        rol: "Administrativo"
+        nombre: usuario.nombre,
+        legajo: usuario.id,
+        rol: usuario.rol
     };
 
     const irATramite = (ruta: string) => {
-        router.push(`/${ruta}`); // Te lleva automáticamente a la ruta que le pases
+        router.push(`/${ruta}`);
     };
 
+    useEffect(() => {
+        if (sessionStorage.getItem('usuario') === null) {
+            router.replace('/login');
+        }
+    }, [router]);
+
     return (
-        <div style={{ 
-            background: '#f8fafc', 
-            height: '100vh', 
-            maxHeight: '100vh', 
-            overflow: 'hidden', 
-            padding: '30px 20px 10px 20px' 
+        <div style={{
+            background: '#f8fafc',
+            height: '100vh',
+            maxHeight: '100vh',
+            overflow: 'hidden',
+            padding: '30px 20px 10px 20px'
         }}>
             <div style={{ maxWidth: 1000, margin: '0 auto' }}>
-                
+
                 <Row justify="space-between" align="middle" style={{ marginBottom: '24px' }}>
                     <Col>
                         <Flex align="center" gap="12px">
@@ -57,13 +67,13 @@ export default function MenuPrincipal() {
                         <Flex align="center" gap="16px" style={{ background: '#ffffff', padding: '6px 16px', borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 1px 2px rgba(0,0,0,0.02)' }}>
                             <div style={{ textAlign: 'right' }}>
                                 <Text strong style={{ display: 'block', fontSize: '13px', color: '#1e293b' }}>{operador.nombre}</Text>
-                                <Text type="secondary" style={{ fontSize: '11px' }}>Legajo: {operador.legajo}</Text>
+                                <Text type="secondary" style={{ fontSize: '11px' }}>Legajo: {String(operador.legajo).padStart(6, '0')}</Text>
                             </div>
-                        <Button 
-                            type="text" 
-                            icon={<PoweroffOutlined style={{ color: '#ff4d4f', fontSize: '15px' }} />} 
-                            onClick={() => irATramite('login')} 
-                        />
+                            <Button
+                                type="text"
+                                icon={<PoweroffOutlined style={{ color: '#ff4d4f', fontSize: '15px' }} />}
+                                onClick={() => irATramite('login')}
+                            />
                         </Flex>
                     </Col>
                 </Row>
@@ -73,12 +83,12 @@ export default function MenuPrincipal() {
                         Gestión Operativa de Licencias
                     </Text>
                     <Divider style={{ margin: '8px 0 16px 0' }} />
-                    
+
                     <Row gutter={[16, 16]}>
 
                         <Col span={8}>
-                            <Card 
-                                hoverable 
+                            <Card
+                                hoverable
                                 variant="borderless"
                                 onClick={() => irATramite('menu/renovacion')}
                                 style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.02)', borderRadius: '10px', border: '1px solid #e2e8f0', textAlign: 'center', padding: '12px 0' }}
@@ -90,8 +100,8 @@ export default function MenuPrincipal() {
                         </Col>
 
                         <Col span={8}>
-                            <Card 
-                                hoverable 
+                            <Card
+                                hoverable
                                 variant="borderless"
                                 onClick={() => irATramite('menu/alta')}
                                 style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.02)', borderRadius: '10px', border: '1px solid #e2e8f0', textAlign: 'center', padding: '12px 0' }}
@@ -103,8 +113,8 @@ export default function MenuPrincipal() {
                         </Col>
 
                         <Col span={8}>
-                            <Card 
-                                hoverable 
+                            <Card
+                                hoverable
                                 variant="borderless"
                                 onClick={() => irATramite('menu/copia')}
                                 style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.02)', borderRadius: '10px', border: '1px solid #e2e8f0', textAlign: 'center', padding: '12px 0' }}
@@ -116,8 +126,8 @@ export default function MenuPrincipal() {
                         </Col>
 
                         <Col span={24}>
-                            <Card 
-                                hoverable 
+                            <Card
+                                hoverable
                                 variant="borderless"
                                 onClick={() => irATramite('menu/buscar')}
                                 style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.02)', borderRadius: '10px', border: '1px solid #e2e8f0', padding: '4px 16px' }}
@@ -142,8 +152,8 @@ export default function MenuPrincipal() {
 
                     <Row>
                         <Col span={24}>
-                            <Card 
-                                hoverable 
+                            <Card
+                                hoverable
                                 variant="borderless"
                                 onClick={() => irATramite('menu/usuarios')}
                                 style={{ background: '#ffffff', boxShadow: '0 4px 12px rgba(0,0,0,0.02)', borderRadius: '10px', border: '1px solid #cbd5e1', padding: '4px 16px' }}
