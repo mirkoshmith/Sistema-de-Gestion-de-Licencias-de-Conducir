@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, Row, Col, Typography, Flex, Button, Divider } from 'antd';
 import { useRouter } from 'next/navigation';
 import {
@@ -13,16 +13,23 @@ import {
     PoweroffOutlined
 } from '@ant-design/icons';
 
-import { useEffect } from 'react';
-
 const { Title, Text } = Typography;
 
 export default function MenuPrincipal() {
-
     const router = useRouter();
-    const usuario = JSON.parse(
-        sessionStorage.getItem("usuario") || "{}"
-    );
+    const [isClient, setIsClient] = useState(false);
+
+    // Evitamos el error de hidratación en Next.js
+    useEffect(() => {
+        setIsClient(true);
+        if (sessionStorage.getItem('usuario') === null) {
+            router.replace('/login');
+        }
+    }, [router]);
+
+    const usuarioStr = typeof window !== 'undefined' ? sessionStorage.getItem("usuario") : null;
+    const usuario = usuarioStr ? JSON.parse(usuarioStr) : {};
+    
     const operador = {
         nombre: usuario.nombre,
         legajo: usuario.id,
@@ -33,11 +40,8 @@ export default function MenuPrincipal() {
         router.push(`/${ruta}`);
     };
 
-    useEffect(() => {
-        if (sessionStorage.getItem('usuario') === null) {
-            router.replace('/login');
-        }
-    }, [router]);
+    // Prevenir renderizado hasta que el cliente esté montado
+    if (!isClient) return null;
 
     return (
         <div style={{
@@ -72,7 +76,10 @@ export default function MenuPrincipal() {
                             <Button
                                 type="text"
                                 icon={<PoweroffOutlined style={{ color: '#ff4d4f', fontSize: '15px' }} />}
-                                onClick={() => irATramite('login')}
+                                onClick={() => {
+                                    sessionStorage.removeItem('usuario');
+                                    irATramite('login');
+                                }}
                             />
                         </Flex>
                     </Col>
@@ -144,32 +151,35 @@ export default function MenuPrincipal() {
                     </Row>
                 </div>
 
-                <div style={{ marginTop: '24px' }}>
-                    <Text strong style={{ color: '#475569', fontSize: '14px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                        Administración y Seguridad del Sistema
-                    </Text>
-                    <Divider style={{ margin: '8px 0 16px 0' }} />
+                {/* RENDERIZADO CONDICIONAL: Solo los ADMINISTRADORES ven esta sección */}
+                {operador.rol === 'ADMINISTRADOR' && (
+                    <div style={{ marginTop: '24px' }}>
+                        <Text strong style={{ color: '#475569', fontSize: '14px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                            Administración y Seguridad del Sistema
+                        </Text>
+                        <Divider style={{ margin: '8px 0 16px 0' }} />
 
-                    <Row>
-                        <Col span={24}>
-                            <Card
-                                hoverable
-                                variant="borderless"
-                                onClick={() => irATramite('menu/usuarios')}
-                                style={{ background: '#ffffff', boxShadow: '0 4px 12px rgba(0,0,0,0.02)', borderRadius: '10px', border: '1px solid #cbd5e1', padding: '4px 16px' }}
-                            >
-                                <Flex align="center" gap="20px">
-                                    <UsergroupAddOutlined style={{ fontSize: '24px', color: '#0958d9', background: '#e6f4ff', padding: '14px', borderRadius: '50%' }} />
-                                    <div style={{ flexGrow: 1 }}>
-                                        <Title level={5} style={{ margin: '0 0 2px 0', fontWeight: 600 }}>Gestión de Usuarios Administrativos</Title>
-                                        <Text type="secondary" style={{ fontSize: '13px' }}>Altas, modificaciones de roles operativos y auditoría de permisos del personal de la mesa de entradas.</Text>
-                                    </div>
-                                    <Button type="primary" ghost icon={<SafetyCertificateOutlined />}>Módulo IT</Button>
-                                </Flex>
-                            </Card>
-                        </Col>
-                    </Row>
-                </div>
+                        <Row>
+                            <Col span={24}>
+                                <Card
+                                    hoverable
+                                    variant="borderless"
+                                    onClick={() => irATramite('menu/usuarios')}
+                                    style={{ background: '#ffffff', boxShadow: '0 4px 12px rgba(0,0,0,0.02)', borderRadius: '10px', border: '1px solid #cbd5e1', padding: '4px 16px' }}
+                                >
+                                    <Flex align="center" gap="20px">
+                                        <UsergroupAddOutlined style={{ fontSize: '24px', color: '#0958d9', background: '#e6f4ff', padding: '14px', borderRadius: '50%' }} />
+                                        <div style={{ flexGrow: 1 }}>
+                                            <Title level={5} style={{ margin: '0 0 2px 0', fontWeight: 600 }}>Gestión de Usuarios Administrativos</Title>
+                                            <Text type="secondary" style={{ fontSize: '13px' }}>Altas, modificaciones de roles operativos y auditoría de permisos del personal de la mesa de entradas.</Text>
+                                        </div>
+                                        <Button type="primary" ghost icon={<SafetyCertificateOutlined />}>Módulo IT</Button>
+                                    </Flex>
+                                </Card>
+                            </Col>
+                        </Row>
+                    </div>
+                )}
 
             </div>
         </div>

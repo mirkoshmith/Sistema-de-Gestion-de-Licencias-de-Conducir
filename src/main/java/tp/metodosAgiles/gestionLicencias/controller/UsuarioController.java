@@ -60,4 +60,17 @@ public class UsuarioController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    
+    @GetMapping("/buscar")
+    public ResponseEntity<?> buscarUsuario(@RequestParam String username) {
+        try {
+            UsuarioDTO usuario = usuarioService.buscarPorUsername(username);
+            return ResponseEntity.ok(usuario);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+
 }

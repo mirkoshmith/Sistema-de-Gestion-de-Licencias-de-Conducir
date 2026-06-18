@@ -71,6 +71,13 @@ public class UsuarioService {
         return usuarioRepository.save(usuarioEditado);
     }
 
+    public UsuarioDTO buscarPorUsername(String username) {
+        Usuario usuario = usuarioRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("No se encontró ningún usuario con ese username en el sistema."));
+        return UsuarioDTO.toResponse(usuario);
+    }
+
+    
     public UsuarioDTO autenticar(String username, String contrasenia) {
         Usuario usuario = usuarioRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado."));
