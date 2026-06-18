@@ -15,12 +15,14 @@ import tp.metodosAgiles.gestionLicencias.entity.Titular;
 import tp.metodosAgiles.gestionLicencias.entity.enums.ClaseLicencia;
 import tp.metodosAgiles.gestionLicencias.entity.enums.EstadoLicencia;
 import tp.metodosAgiles.gestionLicencias.repository.LicenciaRepository;
+import tp.metodosAgiles.gestionLicencias.util.DateUtils;
 import tp.metodosAgiles.gestionLicencias.util.TextUtils;
 
 @Service
 public class LicenciaService {
 
-    private final TitularService titularService = new TitularService();
+    @Autowired
+    private TitularService titularService;
 
     // Inyecto el Repositorio de Licencias para (T-03) [Mirko]
     @Autowired
@@ -249,4 +251,13 @@ public class LicenciaService {
                 .map(licencia -> LicenciaDTO.toResponse(licencia, EstadoLicencia.VIGENTE))
                 .collect(Collectors.toList());
     }
+
+    public String obtenerNuevaFechaVigencia(String nroDocumento) {
+        Licencia licencia = licenciaRepository.findFirstByTitular_NroDocumentoOrderByFechaVencimientoDesc(nroDocumento)
+                .orElseThrow(() -> new RuntimeException("No se encontró la licencia"));
+        String fechaNuevaVigencia = DateUtils.formatearFecha(DateUtils
+                .calcularVencimientoProximoCumpleanios(LocalDate.now(), calcularVigencia(licencia)));
+        return fechaNuevaVigencia;
+    }
+
 }

@@ -67,8 +67,12 @@ public class LicenciaController {
             @RequestParam(required = false) String grupoSanguineo,
             @RequestParam(required = false) String factorRh,
             @RequestParam(required = false) Boolean donante) {
-        
         return licenciaService.buscarLicenciasVigentesConFiltros(nombre, apellido, grupoSanguineo, factorRh, donante);
+    }
+
+    @GetMapping("/nuevaVigencia")
+    public String obtenerNuevaFechaVigencia(@RequestParam String nroDocumento) {
+        return licenciaService.obtenerNuevaFechaVigencia(nroDocumento);
     }
 
 }

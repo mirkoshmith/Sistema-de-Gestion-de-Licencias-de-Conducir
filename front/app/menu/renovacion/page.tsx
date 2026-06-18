@@ -15,28 +15,33 @@ export default function RenovacionLicencia() {
     const [loadingBusqueda, setLoadingBusqueda] = useState<boolean>(false);
     const [loadingRenovacion, setLoadingRenovacion] = useState<boolean>(false);
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
-    
+
     const [datosTitular, setDatosTitular] = useState<any | null>(null);
     const [valoresFinales, setValoresFinales] = useState<any | null>(null);
+    const [nuevaVigencia, setNuevaVigencia] = useState<string>("");
 
-    const COSTO_RENOVACION = 4800.00;
+    const COSTO_RENOVACION = 50.00;
     const NUEVA_VIGENCIA = "17/06/2031";
 
     const manejarBusqueda = async (values: { documento: string }) => {
         setLoadingBusqueda(true);
         try {
-            await new Promise((resolve) => setTimeout(resolve, 1100));
-
-            if (values.documento === '12345678' || values.documento.length > 6) {
-                const datosMock = {
-                    titular: 'JUAN IGNACIO ROSSI',
-                    dni: values.documento,
-                    claseSolicitada: 'B',
-                    fechaVencimientoAnterior: '15/05/2026',
-                    grupoSanguineo: 'O+',
-                    donante: 'SÍ'
+            const nuevaVigenciaResponse = await fetch(`http://localhost:8080/api/licencias/nuevaVigencia?nroDocumento=${values.documento}`);
+            const nuevaVigenciaData = await nuevaVigenciaResponse.text();
+            setNuevaVigencia(nuevaVigenciaData);
+            const response = await fetch(`http://localhost:8080/api/licencias/titular?nroDocumento=${values.documento}`);
+            const licencia = await response.json();
+            if (response.ok) {
+                const datosTitular = {
+                    titular: licencia.nombre + " " + licencia.apellido,
+                    dni: licencia.nroDocumentoTitular,
+                    claseSolicitada: licencia.clase,
+                    fechaVencimientoAnterior: licencia.fechaVencimiento,
+                    grupoSanguineo: licencia.grupoSanguineo + licencia.factorRh,
+                    donante: licencia.donante,
+                    vigente: licencia.estado === 'VIGENTE'
                 };
-                setDatosTitular(datosMock);
+                setDatosTitular(datosTitular);
                 form.setFieldsValue({ motivo: 'VENCIMIENTO_CRONOLOGICO' });
                 message.success('Registro de titular localizado.');
                 setCurrentStep(1);
@@ -56,7 +61,7 @@ export default function RenovacionLicencia() {
             ...values,
             ...datosTitular,
             costo: COSTO_RENOVACION,
-            nuevaVigencia: NUEVA_VIGENCIA
+            nuevaVigencia: nuevaVigencia
         });
         setIsConfirmModalOpen(true);
     };
@@ -85,7 +90,7 @@ export default function RenovacionLicencia() {
     return (
         <div style={{ background: '#f5f7fa', height: '100vh', maxHeight: '100vh', overflow: 'hidden', padding: '30px 24px' }}>
             <div style={{ maxWidth: 950, margin: '0 auto' }}>
-                
+
                 <Flex align="center" justify="space-between" style={{ marginBottom: '24px' }}>
                     <Flex align="center" gap="14px">
                         <div style={{ width: '5px', height: '38px', backgroundColor: '#1677ff', borderRadius: '3px' }} />
@@ -102,9 +107,9 @@ export default function RenovacionLicencia() {
                             </Title>
                         </div>
                     </Flex>
-                    <Button 
-                        type="text" 
-                        icon={<ArrowLeftOutlined style={{ fontSize: '16px' }} />} 
+                    <Button
+                        type="text"
+                        icon={<ArrowLeftOutlined style={{ fontSize: '16px' }} />}
                         onClick={() => router.push('/menu')}
                         disabled={currentStep === 1 || loadingRenovacion}
                         style={{ display: 'flex', alignItems: 'center', fontWeight: 600, color: '#475569', fontSize: '15px', height: '40px' }}
@@ -113,8 +118,8 @@ export default function RenovacionLicencia() {
                     </Button>
                 </Flex>
 
-                <Steps 
-                    current={currentStep} 
+                <Steps
+                    current={currentStep}
                     style={{ marginBottom: '28px', padding: '0 10px' }}
                     items={[
                         { title: <span style={{ fontSize: '15px', fontWeight: 500 }}>Localizar Titular</span> },
@@ -132,25 +137,25 @@ export default function RenovacionLicencia() {
                                 <Text type="secondary" style={{ fontSize: '14px', display: 'block', marginTop: '6px' }}>Ingrese el DNI del contribuyente para cargar su historial actual y verificar inhabilitaciones vigentes.</Text>
                             </div>
                             <Form form={form} layout="inline" onFinish={manejarBusqueda} style={{ alignItems: 'flex-start' }}>
-                                <Form.Item 
-                                    name="documento" 
+                                <Form.Item
+                                    name="documento"
                                     rules={[{ required: true, message: 'Falta el documento.' }, { pattern: /^[0-9]+$/, message: 'Solo números.' }]}
                                     style={{ flexGrow: 1, marginRight: '16px' }}
                                 >
-                                    <Input 
-                                        size="large" 
-                                        prefix={<SearchOutlined style={{ fontSize: '18px', color: '#94a3b8' }} />} 
-                                        placeholder="Número de DNI sin puntos (Ej: 12345678)" 
-                                        maxLength={8} 
+                                    <Input
+                                        size="large"
+                                        prefix={<SearchOutlined style={{ fontSize: '18px', color: '#94a3b8' }} />}
+                                        placeholder="Número de DNI sin puntos (Ej: 12345678)"
+                                        maxLength={8}
                                         style={{ height: '54px', fontSize: '16px', borderRadius: '8px' }}
                                     />
                                 </Form.Item>
                                 <Form.Item style={{ marginRight: 0 }}>
-                                    <Button 
-                                        type="primary" 
-                                        htmlType="submit" 
-                                        size="large" 
-                                        loading={loadingBusqueda} 
+                                    <Button
+                                        type="primary"
+                                        htmlType="submit"
+                                        size="large"
+                                        loading={loadingBusqueda}
                                         style={{ background: '#1677ff', height: '54px', fontSize: '16px', fontWeight: 'bold', padding: '0 24px', borderRadius: '8px' }}
                                     >
                                         Buscar Historial
@@ -164,16 +169,16 @@ export default function RenovacionLicencia() {
                         <Form form={form} layout="vertical" onFinish={previsualizarRenovacion}>
                             <Row gutter={20}>
                                 <Col span={14}>
-                                    <Card 
-                                        variant="borderless" 
+                                    <Card
+                                        variant="borderless"
                                         title={<span style={{ fontSize: '17px', fontWeight: 700 }}><IdcardOutlined style={{ marginRight: 8, color: '#1677ff' }} /> Datos Actuales del Contribuyente</span>}
                                         style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.05)', borderRadius: '12px' }}
                                     >
-                                        <Descriptions 
-                                            column={2} 
-                                            bordered 
-                                            size="middle" 
-                                            layout="vertical" 
+                                        <Descriptions
+                                            column={2}
+                                            bordered
+                                            size="middle"
+                                            layout="vertical"
                                             styles={{
                                                 label: { fontSize: '14px', fontWeight: 600, background: '#f8fafc', color: '#475569' },
                                                 content: { fontSize: '15px', color: '#1e293b', fontWeight: 500 }
@@ -184,14 +189,14 @@ export default function RenovacionLicencia() {
                                             </Descriptions.Item>
                                             <Descriptions.Item label="Documento N°"><Text style={{ fontSize: '16px', fontWeight: 600 }}>{datosTitular.dni}</Text></Descriptions.Item>
                                             <Descriptions.Item label="Clase Actual"><Tag color="blue" style={{ fontSize: '13px', fontWeight: 'bold', padding: '4px 10px' }}>Clase {datosTitular.claseSolicitada}</Tag></Descriptions.Item>
-                                            <Descriptions.Item label="Vencimiento Anterior" span={2}><Text delete type="danger" style={{ fontSize: '15px' }}>{datosTitular.fechaVencimientoAnterior}</Text></Descriptions.Item>
+                                            <Descriptions.Item label="Vencimiento Anterior" span={2}><Text delete={!datosTitular.vigente} type={datosTitular.vigente ? undefined : 'danger'} style={{ fontSize: '15px' }}>{datosTitular.fechaVencimientoAnterior}</Text></Descriptions.Item>
                                         </Descriptions>
 
                                         <Divider style={{ margin: '20px 0 16px 0' }} />
 
-                                        <Form.Item 
-                                            name="motivo" 
-                                            label={<Text strong style={{ color: '#475569', fontSize: '15px' }}><FormOutlined /> Motivo Legal del Trámite</Text>} 
+                                        <Form.Item
+                                            name="motivo"
+                                            label={<Text strong style={{ color: '#475569', fontSize: '15px' }}><FormOutlined /> Motivo Legal del Trámite</Text>}
                                             rules={[{ required: true }]}
                                         >
                                             <Select size="large" style={{ height: '48px', fontSize: '15px' }}>
@@ -204,39 +209,39 @@ export default function RenovacionLicencia() {
                                 </Col>
 
                                 <Col span={10}>
-                                    <Card 
-                                        variant="borderless" 
+                                    <Card
+                                        variant="borderless"
                                         title={<span style={{ fontSize: '17px', fontWeight: 700 }}><DollarOutlined style={{ marginRight: 8, color: '#52c41a' }} /> Nueva Liquidación</span>}
                                         style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.05)', borderRadius: '12px', height: '100%' }}
                                     >
                                         <Flex vertical justify="space-between" style={{ height: '100%', minHeight: '320px' }}>
                                             <Flex vertical gap="18px">
                                                 <div>
-                                                    <Statistic 
-                                                        title={<span style={{ fontSize: '14px', color: '#64748b', fontWeight: 500 }}>Nueva Vigencia Calculada</span>} 
-                                                        value={NUEVA_VIGENCIA}
+                                                    <Statistic
+                                                        title={<span style={{ fontSize: '14px', color: '#64748b', fontWeight: 500 }}>Nueva Vigencia Calculada</span>}
+                                                        value={nuevaVigencia}
                                                         formatter={(value) => <Text style={{ color: '#52c41a', fontWeight: 800, fontSize: '24px' }}>{value}</Text>}
                                                     />
                                                     <Text type="secondary" style={{ fontSize: '13px', display: 'block', marginTop: '4px' }}>Calculado según edad y clase solicitada.</Text>
                                                 </div>
                                                 <Divider style={{ margin: '4px 0' }} />
                                                 <div>
-                                                    <Statistic 
-                                                        title={<span style={{ fontSize: '14px', color: '#64748b', fontWeight: 500 }}>Costo Total Arancel de Renovación</span>} 
-                                                        value={COSTO_RENOVACION} 
-                                                        precision={2} 
-                                                        prefix="$" 
-                                                        styles={{ content: { color: '#0f172a', fontWeight: 900, fontSize: '38px' } }} 
+                                                    <Statistic
+                                                        title={<span style={{ fontSize: '14px', color: '#64748b', fontWeight: 500 }}>Costo Total Arancel de Renovación</span>}
+                                                        value={COSTO_RENOVACION}
+                                                        precision={2}
+                                                        prefix="$"
+                                                        styles={{ content: { color: '#0f172a', fontWeight: 900, fontSize: '38px' } }}
                                                     />
                                                 </div>
                                             </Flex>
-                                            
+
                                             <Flex vertical gap="10px">
-                                                <Button 
-                                                    type="primary" 
+                                                <Button
+                                                    type="primary"
                                                     htmlType="submit"
-                                                    size="large" 
-                                                    block 
+                                                    size="large"
+                                                    block
                                                     style={{ background: '#1677ff', height: '54px', fontSize: '16px', fontWeight: 'bold', borderRadius: '8px' }}
                                                 >
                                                     Solicitar Renovación
@@ -257,7 +262,7 @@ export default function RenovacionLicencia() {
                             <CheckCircleOutlined style={{ fontSize: '72px', color: '#52c41a', marginBottom: '20px' }} />
                             <Title level={3} style={{ margin: '0 0 12px 0', fontWeight: 800 }}>¡Licencia Renovada Exitosamente!</Title>
                             <Text type="secondary" style={{ maxWidth: '600px', margin: '0 auto 28px auto', display: 'block', fontSize: '15px', lineHeight: '1.5' }}>
-                                El trámite impactó de forma conforme en la base de datos de auditoría. Se extendió la vigencia para el contribuyente <Text strong style={{ color: '#0f172a' }}>{datosTitular?.titular}</Text> hasta el día <Text strong style={{ color: '#52c41a' }}>{NUEVA_VIGENCIA}</Text>.
+                                El trámite impactó de forma conforme en la base de datos de auditoría. Se extendió la vigencia para el contribuyente <Text strong style={{ color: '#0f172a' }}>{datosTitular?.titular}</Text> hasta el día <Text strong style={{ color: '#52c41a' }}>{nuevaVigencia}</Text>.
                             </Text>
                             <Flex justify="center" gap="large">
                                 <Button type="primary" onClick={reiniciarTramite} style={{ background: '#1677ff', height: '50px', fontSize: '15px', fontWeight: 'bold', padding: '0 24px', borderRadius: '8px' }}>

@@ -7,6 +7,8 @@ import lombok.Setter;
 import tp.metodosAgiles.gestionLicencias.entity.Licencia;
 import tp.metodosAgiles.gestionLicencias.entity.enums.EstadoLicencia;
 
+import java.time.format.DateTimeFormatter;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -26,6 +28,7 @@ public class LicenciaDTO {
     private String factorRh;
 
     public static LicenciaDTO toResponse(Licencia licencia, EstadoLicencia estado) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         LicenciaDTO dto = new LicenciaDTO();
         dto.setId(licencia.getId());
         dto.setTipoDocumentoTitular(licencia.getTitular().getTipoDocumento().toString());
@@ -33,8 +36,8 @@ public class LicenciaDTO {
         dto.setApellido(licencia.getTitular().getApellido());
         dto.setNombre(licencia.getTitular().getNombre());
         dto.setClase(licencia.getClase().toString());
-        dto.setFechaEmision(licencia.getFechaEmision().toString());
-        dto.setFechaVencimiento(licencia.getFechaVencimiento().toString());
+        dto.setFechaEmision(licencia.getFechaEmision().format(formatter).toString());
+        dto.setFechaVencimiento(licencia.getFechaVencimiento().format(formatter).toString());
         dto.setEstado(estado.toString());
         dto.setGrupoSanguineo(licencia.getTitular().getGrupoSanguineo().toString());
         dto.setDonante(licencia.getTitular().getDonante() ? "SÍ" : "NO");
