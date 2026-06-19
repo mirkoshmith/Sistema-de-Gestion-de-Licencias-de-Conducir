@@ -1,4 +1,4 @@
 @echo off
-start cmd /k "mvn spring-boot:run"
+start cmd /k "title Backend (Spring Boot) && call mvnw spring-boot:run"
 
-start cmd /k "cd front && npm install && npm run dev"
+start cmd /k "title Frontend (Next.js) && cd front && npm install && npm run dev"
