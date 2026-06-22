@@ -37,7 +37,6 @@ public class UsuarioService {
 
     public Usuario modificarUsuario(Long idUsuarioAEditar, Long idAdmin, UsuarioDTO dtoNuevo) {
 
-        // 1. Validar permisos de administrador
         Usuario admin = usuarioRepository.findById(idAdmin)
                 .orElseThrow(() -> new RuntimeException("Administrador no encontrado."));
 
@@ -45,29 +44,24 @@ public class UsuarioService {
             throw new RuntimeException("Permisos denegados: Solo un administrador puede modificar usuarios.");
         }
 
-        // 2. Buscar el usuario que queremos modificar
         Usuario usuarioEditado = usuarioRepository.findById(idUsuarioAEditar)
                 .orElseThrow(() -> new RuntimeException("El usuario a modificar no existe."));
 
-        // Validar que si le cambian el username, no le pongan uno que ya está en uso
         if (!usuarioEditado.getUsername().equals(dtoNuevo.getUsername()) &&
                 usuarioRepository.existsByUsername(dtoNuevo.getUsername())) {
             throw new RuntimeException("Ya existe otro usuario utilizando ese username.");
         }
 
-        // 3. Actualizar datos del usuario
         usuarioEditado.setUsername(dtoNuevo.getUsername());
         usuarioEditado.setPassword(dtoNuevo.getPassword());
         usuarioEditado.setNombre(dtoNuevo.getNombre());
         usuarioEditado.setApellido(dtoNuevo.getApellido());
         usuarioEditado.setRol(dtoNuevo.getRol());
 
-        // 4. Registrar auditoría de modificaciones
         log.info(
                 "AUDITORÍA - Modificación: El administrador '{}' (ID: {}) modificó los datos del usuario '{}' (ID: {})",
                 admin.getUsername(), admin.getId(), usuarioEditado.getUsername(), usuarioEditado.getId());
 
-        // Guardamos los cambios
         return usuarioRepository.save(usuarioEditado);
     }
 
@@ -85,6 +79,24 @@ public class UsuarioService {
             throw new RuntimeException("Contraseña incorrecta.");
         }
         return UsuarioDTO.toResponse(usuario);
+    }
+
+    public void eliminarUsuario(Long idUsuarioAEliminar, Long idAdmin) {
+        Usuario admin = usuarioRepository.findById(idAdmin)
+                .orElseThrow(() -> new RuntimeException("Administrador no encontrado."));
+
+        if (admin.getRol() != RolUsuario.ADMINISTRADOR) {
+            throw new RuntimeException("Permisos denegados: Solo un administrador puede eliminar usuarios.");
+        }
+
+        Usuario usuarioEliminado = usuarioRepository.findById(idUsuarioAEliminar)
+                .orElseThrow(() -> new RuntimeException("El usuario a eliminar no existe."));
+
+        log.info(
+                "AUDITORÍA - Eliminación: El administrador '{}' (ID: {}) eliminó de forma permanente al usuario '{}' (ID: {})",
+                admin.getUsername(), admin.getId(), usuarioEliminado.getUsername(), usuarioEliminado.getId());
+
+        usuarioRepository.delete(usuarioEliminado);
     }
 
 }
