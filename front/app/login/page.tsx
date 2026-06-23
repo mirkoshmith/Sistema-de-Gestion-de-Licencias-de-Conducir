@@ -102,7 +102,7 @@ export default function LoginAdministrativo() {
                     >
                         <Form.Item
                             name="username"
-                            label={<Text strong style={{ color: '#475569', fontSize: '13px' }}>Usuario o Legajo</Text>}
+                            label={<Text strong style={{ color: '#475569', fontSize: '13px' }}>Usuario</Text>}
                             rules={[{ required: true, message: 'El usuario/legajo es obligatorio.' }]}
                         >
                             <Input
