@@ -215,6 +215,7 @@ public class LicenciaService {
         nuevaLicencia.setClase(licenciaAnterior.getClase());
         nuevaLicencia.setObservacionesLimitaciones(licenciaAnterior.getObservacionesLimitaciones());
         nuevaLicencia.setFechaEmision(LocalDate.now()); // Fecha actual
+        nuevaLicencia.setUsuarioAdministrador(licenciaAnterior.getUsuarioAdministrador());
 
         // 4. Calculamos nueva vigencia y fecha de vencimiento
         int aniosVigencia = calcularVigencia(nuevaLicencia);

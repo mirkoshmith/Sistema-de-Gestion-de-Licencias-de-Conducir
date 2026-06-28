@@ -70,11 +70,33 @@ export default function RenovacionLicencia() {
         setIsConfirmModalOpen(false);
         setLoadingRenovacion(true);
         try {
-            await new Promise((resolve) => setTimeout(resolve, 1500));
-            message.success('¡Renovación de licencia registrada y auditada con éxito!');
-            setCurrentStep(2);
+            const url = `http://localhost:8080/api/licencias/renovar?nroDocumento=${valoresFinales.dni}&modificacionDatos=${valoresFinales.motivo !== "VENCIMIENTO_CRONOLOGICO"}`;
+
+            console.log(url);
+
+            const response = await fetch(url, {
+                method: "POST"
+            });
+
+            console.log(response.status);
+
+            const texto = await response.text();
+            console.log(texto);
+
+            if (!response.ok) {
+                message.error(texto);
+                return;
+            }
+
+            if (response.ok) {
+                message.success('¡Renovación de licencia registrada y auditada con éxito!');
+                setCurrentStep(2);
+            }
+            else {
+                message.error('No se pudo procesar la renovación en la base de datos. Codigo de Error 1');
+            }
         } catch (error) {
-            message.error('No se pudo procesar la renovación en la base de datos.');
+            message.error('No se pudo procesar la renovación en la base de datos. Codigo de Error 2');
         } finally {
             setLoadingRenovacion(false);
         }
