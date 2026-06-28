@@ -99,7 +99,7 @@ public class TitularService {
                 dto.getIdUsuarioAdministrador(), titular.getNombre(), titular.getApellido(), titular.getNroDocumento(), java.time.LocalDate.now());
 
         // Notificamos la posibilidad de renovación
-        return "Datos actualizados correctamente. Atención: Debido a la modificación de sus datos personales, el titular ahora se encuentra habilitado para solicitar la renovación de su licencia.";
+        return "Datos actualizados! Atención: Debido a la modificación de sus datos personales, el titular se encuentra habilitado para solicitar la renovación de su licencia.";
     }
 
 }
