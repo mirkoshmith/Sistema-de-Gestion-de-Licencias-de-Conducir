@@ -31,7 +31,7 @@ export default function MenuPrincipal() {
     const usuario = usuarioStr ? JSON.parse(usuarioStr) : {};
     
     const operador = {
-        nombre: usuario.nombre,
+        usuario: usuario.username,
         legajo: usuario.id,
         rol: usuario.rol
     };
@@ -70,7 +70,7 @@ export default function MenuPrincipal() {
                     <Col>
                         <Flex align="center" gap="16px" style={{ background: '#ffffff', padding: '6px 16px', borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 1px 2px rgba(0,0,0,0.02)' }}>
                             <div style={{ textAlign: 'right' }}>
-                                <Text strong style={{ display: 'block', fontSize: '13px', color: '#1e293b' }}>{operador.nombre}</Text>
+                                <Text strong style={{ display: 'block', fontSize: '13px', color: '#1e293b' }}>{operador.usuario}</Text>
                                 <Text type="secondary" style={{ fontSize: '11px' }}>Legajo: {String(operador.legajo).padStart(6, '0')}</Text>
                             </div>
                             <Button
